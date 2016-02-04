@@ -4,7 +4,8 @@ from io import BytesIO
 from json import loads
 from time import strptime, strftime
 from subprocess import call
-from os.path import expanduser
+from os import makedirs
+from os.path import expanduser, split
 from urllib.request import urlopen
 
 from PIL import Image
@@ -16,6 +17,9 @@ from utils import get_desktop_environment
 
 # Increases the quality and the size. Possible values: 4, 8, 16, 20
 level = 4
+
+# Path to the output file
+output_file = expanduser("~/.himawari/himawari-latest.png")
 
 # ==============================================================================
 
@@ -45,7 +49,7 @@ def main():
             print("Downloading tiles: {}/{} completed".format(x*level + y + 1, level*level), end="\r")
     print("\nDownloaded\n")
 
-    output_file = expanduser("~/.himawari-latest.png")
+    makedirs(split(output_file)[0], exist_ok=True)
     png.save(output_file, "PNG")
 
     de = get_desktop_environment()
