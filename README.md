@@ -9,7 +9,20 @@ as your desktop background.
 Set a cronjob that runs in every 10 minutes to automatically get the
 near-realtime picture of Earth.
 
-Tested on Ubuntu 15.10.
+## Supported Desktop Environments
+### Tested
+* Unity 7
+
+### Not Tested
+* GNOME 3
+* MATE
+
+### Not Supported
+* [LXDE](http://wiki.lxde.org/en/LXDE_To_Do#PCManFM_.28file_manager.29)
+* KDE
+
+  Because I simply couldn't find a way to do it. Maybe [KDE API](http://api.kde.org/4.9-api/kdelibs-apidocs/plasma/html/classPlasma_1_1Wallpaper.html)?
+* ... and all other desktop environments that are not mentioned above.
 
 ## Configuration
 You can configure the level of detail, by modifying the script. You can set the

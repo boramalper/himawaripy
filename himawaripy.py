@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from json import loads
 from io import BytesIO
 from urllib.request import urlopen
@@ -6,6 +8,8 @@ from os import system
 from os.path import expanduser
 
 from PIL import Image
+
+from utils import get_desktop_environment
 
 # Configuration
 # =============
@@ -42,11 +46,19 @@ def main():
 
     png.save(expanduser("~/.himawari-latest.png"), "PNG")
 
-    # Because of a bug and stupid design of gsettings, see http://askubuntu.com/a/418521/388226
-    system("gsettings set org.gnome.desktop.background draw-background false \
-            && gsettings set org.gnome.desktop.background picture-uri file://"
-            + expanduser("~/.himawari-latest.png") + 
-            " && gsettings set org.gnome.desktop.background picture-options scaled")
+    de = get_desktop_environment()
+    if de in ["gnome", "unity", "cinnamon"]: 
+        # Because of a bug and stupid design of gsettings, see http://askubuntu.com/a/418521/388226
+        system("gsettings set org.gnome.desktop.background draw-background false \
+                && gsettings set org.gnome.desktop.background picture-uri file://"
+                + expanduser("~/.himawari-latest.png") + 
+                " && gsettings set org.gnome.desktop.background picture-options scaled")
+    elif de == "mate":
+        system("gconftool-2 -type string -set /desktop/gnome/background/picture_filename \"{}\"".format(expanduser("~/.himawari-latest.png")))
+    elif de == "xfce4":
+        system("xfconf-query --channel xfce4-desktop --property /backdrop/screen0/monitor0/image-path --set " + expanduser("~/.himawari-latest.png"))
+    else:
+        exit("Your desktop environment '{}' is not supported.".format(de))
 
     print("Done!\n")
     
