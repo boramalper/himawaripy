@@ -55,9 +55,9 @@ def main():
                 && gsettings set org.gnome.desktop.background picture-uri file://" + output_file +
                 " && gsettings set org.gnome.desktop.background picture-options scaled")
     elif de == "mate":
-        system("gconftool-2 -type string -set /desktop/gnome/background/picture_filename \"{}\"".format(expanduser("~/.himawari-latest.png")))
+        system("gconftool-2 -type string -set /desktop/gnome/background/picture_filename \"{}\"".format(output_file))
     elif de == "xfce4":
-        system("xfconf-query --channel xfce4-desktop --property /backdrop/screen0/monitor0/image-path --set " + expanduser("~/.himawari-latest.png"))
+        system("xfconf-query --channel xfce4-desktop --property /backdrop/screen0/monitor0/image-path --set " + output_file)
     else:
         exit("Your desktop environment '{}' is not supported.".format(de))
 
