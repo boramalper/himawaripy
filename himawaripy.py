@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
-from json import loads
 from io import BytesIO
-from urllib.request import urlopen
+from json import loads
 from time import strptime, strftime
 from os import system
 from os.path import expanduser
+from urllib.request import urlopen
 
 from PIL import Image
 
@@ -26,6 +26,7 @@ def main():
     print("Updating...")
     with urlopen("http://himawari8-dl.nict.go.jp/himawari8/img/D531106/latest.json") as latest_json:
         latest = strptime(loads(latest_json.read().decode("utf-8"))["date"], "%Y-%m-%d %H:%M:%S")
+
     print("Latest version: {} GMT\n".format(strftime("%Y/%m/%d/%H:%M:%S", latest)))
 
     url_format = "http://himawari8.nict.go.jp/img/D531106/{}d/{}/{}_{}_{}.png"
@@ -44,14 +45,14 @@ def main():
             print("Downloading tiles: {}/{} completed".format(x*level + y + 1, level*level), end="\r")
     print("\nDownloaded\n")
 
-    png.save(expanduser("~/.himawari-latest.png"), "PNG")
+    output_file = expanduser("~/.himawari-latest.png")
+    png.save(output_file, "PNG")
 
     de = get_desktop_environment()
-    if de in ["gnome", "unity", "cinnamon"]: 
+    if de in ["gnome", "unity", "cinnamon"]:
         # Because of a bug and stupid design of gsettings, see http://askubuntu.com/a/418521/388226
         system("gsettings set org.gnome.desktop.background draw-background false \
-                && gsettings set org.gnome.desktop.background picture-uri file://"
-                + expanduser("~/.himawari-latest.png") + 
+                && gsettings set org.gnome.desktop.background picture-uri file://" + output_file +
                 " && gsettings set org.gnome.desktop.background picture-options scaled")
     elif de == "mate":
         system("gconftool-2 -type string -set /desktop/gnome/background/picture_filename \"{}\"".format(expanduser("~/.himawari-latest.png")))
@@ -64,4 +65,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
