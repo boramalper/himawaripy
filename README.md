@@ -39,12 +39,12 @@ time to download the tiles.
     vi himawaripy.py
     
     # test whether it's working
-    python3 himawaripy.py
+    ./himawaripy.py
     
     # set up a cronjob
     crontab -e
     # Add the line:
-    # */10 * * * * python3 /home/USERNAME/himawaripy/himawaripy.py
+    # */10 * * * * /home/USERNAME/himawaripy/himawaripy.py
     
 ## Example
 ![Earth, as 2016/02/04/13:30:00 GMT](http://i.imgur.com/4XA6WaM.jpg)
