@@ -44,6 +44,20 @@ def get_desktop_environment():
             return "xfce4"
         elif self.is_running("ksmserver"):
             return "kde"
+
+    # We couldn't detect it so far, so let's try one last time
+    current_desktop = os.environ.get("XDG_CURRENT_DESKTOP")
+    if current_desktop:
+        current_desktop = current_desktop.lower()
+        if current_desktop in ["gnome", "unity", "kde"]:
+            return current_desktop
+
+        # Special Cases
+        elif current_desktop == "xfce":
+            return "xfce4"
+        elif current_desktop == "x-cinnamon":
+            return "cinnamon"
+
     return "unknown"
 
 def is_running(process):
