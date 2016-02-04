@@ -17,6 +17,7 @@ global variable `level` to `4`, `8`, `16`, or `20` to increase the quality (and
 thus the file size as well). Please keep in mind that it will also take more
 time to download the tiles.
 
+You also need to choose the method, how to set your background image. Either set the background via the Gnome shell (*gnome*) or via the feh tool (*feh*). In order to be able to use feh, you need to install prior usage.
 ## Installation
     cd ~
     git clone https://github.com/boramalper/himawaripy.git
@@ -26,12 +27,12 @@ time to download the tiles.
     vi himawaripy.py
     
     # test whether it's working
-    python3 himawaripy.py
+    python3 himawaripy.py --bgmethod gnome
     
     # set up a cronjob
     crontab -e
     # Add the line:
-    # */10 * * * * python3 /home/USERNAME/himawaripy/himawaripy.py
+    # */10 * * * * python3 /home/USERNAME/himawaripy/himawaripy.py --bgmethod gnome
     
 ## Example
 ![Earth, as 2016/02/04/13:30:00 GMT](http://i.imgur.com/4XA6WaM.jpg)

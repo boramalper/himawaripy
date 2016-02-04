@@ -4,6 +4,7 @@ from urllib.request import urlopen
 from time import strptime, strftime
 from os import system
 from os.path import expanduser
+import argparse
 
 from PIL import Image
 
@@ -12,10 +13,26 @@ from PIL import Image
 
 # Increases the quality and the size. Possible values: 4, 8, 16, 20
 level = 4 
-
 # ==============================================================================
 
 def main():
+    # Setup argparser
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--bgmethod", nargs=1, required=True, help="Method to set background, available: gnome, feh")
+    args = parser.parse_args()
+    
+    if args.bgmethod[0] == "feh":
+        bgsetstring = "feh --bg-max ~/.himawari-latest.png"
+    elif args.bgmethod[0] == "gnome":
+        # Because of a bug and stupid design of gsettings, see http://askubuntu.com/a/418521/388226
+        bgsetstring = ("gsettings set org.gnome.desktop.background draw-background false \
+                       && gsettings set org.gnome.desktop.background picture-uri file://"
+                       + expanduser("~/.himawari-latest.png") + 
+                      " && gsettings set org.gnome.desktop.background picture-options scaled")
+    else:
+        print("Unknown bgmethod, exiting.")
+        exit(1)
+
     width = 550
     height = 550
 
@@ -41,15 +58,9 @@ def main():
     print("\nDownloaded\n")
 
     png.save(expanduser("~/.himawari-latest.png"), "PNG")
-
-    # Because of a bug and stupid design of gsettings, see http://askubuntu.com/a/418521/388226
-    system("gsettings set org.gnome.desktop.background draw-background false \
-            && gsettings set org.gnome.desktop.background picture-uri file://"
-            + expanduser("~/.himawari-latest.png") + 
-            " && gsettings set org.gnome.desktop.background picture-options scaled")
-
+    
+    system(bgsetstring)
     print("Done!\n")
     
 if __name__ == "__main__":
     main()
-
