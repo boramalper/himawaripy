@@ -16,9 +16,9 @@ near-realtime picture of Earth.
 ### Not Tested
 * GNOME 3
 * MATE
+* LXDE
 
 ### Not Supported
-* [LXDE](http://wiki.lxde.org/en/LXDE_To_Do#PCManFM_.28file_manager.29)
 * KDE
 
   Because I simply couldn't find a way to do it. Maybe [KDE API](http://api.kde.org/4.9-api/kdelibs-apidocs/plasma/html/classPlasma_1_1Wallpaper.html)?
