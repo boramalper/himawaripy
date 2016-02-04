@@ -15,7 +15,7 @@ from utils import get_desktop_environment
 # =============
 
 # Increases the quality and the size. Possible values: 4, 8, 16, 20
-level = 4 
+level = 4
 
 # ==============================================================================
 
@@ -37,10 +37,10 @@ def main():
         for y in range(level):
             with urlopen(url_format.format(level, width, strftime("%Y/%m/%d/%H%M%S", latest), x, y)) as tile_w:
                 tiledata = tile_w.read()
-    
-            tile = Image.open(BytesIO(tiledata))    
+
+            tile = Image.open(BytesIO(tiledata))
             png.paste(tile, (width*x, height*y, width*(x+1), height*(y+1)))
-        
+
             print("Downloading tiles: {}/{} completed".format(x*level + y + 1, level*level), end="\r")
     print("\nDownloaded\n")
 
@@ -61,7 +61,7 @@ def main():
         exit("Your desktop environment '{}' is not supported.".format(de))
 
     print("Done!\n")
-    
+
 if __name__ == "__main__":
     main()
 
