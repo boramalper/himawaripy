@@ -3,7 +3,7 @@
 from io import BytesIO
 from json import loads
 from time import strptime, strftime
-from os import system
+from subprocess import call
 from os.path import expanduser
 from urllib.request import urlopen
 
@@ -51,13 +51,13 @@ def main():
     de = get_desktop_environment()
     if de in ["gnome", "unity", "cinnamon"]:
         # Because of a bug and stupid design of gsettings, see http://askubuntu.com/a/418521/388226
-        system("gsettings set org.gnome.desktop.background draw-background false \
-                && gsettings set org.gnome.desktop.background picture-uri file://" + output_file +
-                " && gsettings set org.gnome.desktop.background picture-options scaled")
+        call(["gsettings", "set", "org.gnome.desktop.background", "draw-background", "false"])
+        call(["gsettings", "set", "org.gnome.desktop.background", "picture-uri", "file://" + output_file])
+        call(["gsettings", "set", "org.gnome.desktop.background", "picture-options", "scaled"])
     elif de == "mate":
-        system("gconftool-2 -type string -set /desktop/gnome/background/picture_filename \"{}\"".format(output_file))
+        call(["gconftool-2", "-type", "string", "-set", "/desktop/gnome/background/picture_filename", '"{}"'.format(output_file)])
     elif de == "xfce4":
-        system("xfconf-query --channel xfce4-desktop --property /backdrop/screen0/monitor0/image-path --set " + output_file)
+        call(["xfconf-query", "--channel", "xfce4-desktop", "--property", "/backdrop/screen0/monitor0/image-path", "--set", output_file])
     else:
         exit("Your desktop environment '{}' is not supported.".format(de))
 
