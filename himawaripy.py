@@ -4,8 +4,8 @@ from io import BytesIO
 from json import loads
 from time import strptime, strftime
 from subprocess import call
-from os import makedirs
-from os.path import expanduser, split
+from os import makedirs, environ
+from os.path import expanduser, split, join
 from urllib.request import urlopen
 
 from PIL import Image
@@ -19,7 +19,8 @@ from utils import get_desktop_environment
 level = 4
 
 # Path to the output file
-output_file = expanduser("~/.himawari/himawari-latest.png")
+cache_dir = environ.get("XDG_CACHE_HOME") or expanduser("~/.cache")
+output_file = join(cache_dir, "himawari/himawari-latest.png")
 
 # ==============================================================================
 
