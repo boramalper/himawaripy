@@ -55,7 +55,8 @@ def main():
     de = get_desktop_environment()
     if de in ["gnome", "unity", "cinnamon"]:
         # Because of a bug and stupid design of gsettings, see http://askubuntu.com/a/418521/388226
-        call(["gsettings", "set", "org.gnome.desktop.background", "draw-background", "false"])
+        if de == "unity":
+            call(["gsettings", "set", "org.gnome.desktop.background", "draw-background", "false"])
         call(["gsettings", "set", "org.gnome.desktop.background", "picture-uri", "file://" + output_file])
         call(["gsettings", "set", "org.gnome.desktop.background", "picture-options", "scaled"])
     elif de == "mate":
