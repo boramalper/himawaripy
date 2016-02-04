@@ -18,6 +18,7 @@ near-realtime picture of Earth.
 * MATE
 * LXDE
 * KDE
+* OS X
 
 ### Not Supported
 * any other desktop environments that are not mentioned above.
