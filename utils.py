@@ -13,7 +13,7 @@ def get_desktop_environment():
     elif sys.platform == "darwin":
         return "mac"
     else: # Most likely either a POSIX system or something not much common
-        desktop_session = os.environ.get("DESKTOP_SESSION")
+        desktop_session = os.environ.get("XDG_CURRENT_DESKTOP")
         if desktop_session is not None: # Easier to match if we don't have to deal with caracter cases
             desktop_session = desktop_session.lower()
             if desktop_session in ["gnome", "unity", "cinnamon", "mate", "xfce4", "lxde", "fluxbox", 
