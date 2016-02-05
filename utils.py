@@ -19,7 +19,8 @@ def get_desktop_environment():
         if desktop_session is not None: # Easier to match if we don't have to deal with caracter cases
             desktop_session = desktop_session.lower()
             if desktop_session in ["gnome", "unity", "cinnamon", "mate", "xfce4", "lxde", "fluxbox", 
-                                   "blackbox", "openbox", "icewm", "jwm", "afterstep","trinity", "kde"]:
+                                   "blackbox", "openbox", "icewm", "jwm", "afterstep","trinity", "kde", "pantheon",
+                                   "gnome-classic"]:
                 return desktop_session
             ## Special cases ##
             # Canonical sets $DESKTOP_SESSION to Lubuntu rather than LXDE if using LXDE.
@@ -51,7 +52,7 @@ def get_desktop_environment():
     current_desktop = os.environ.get("XDG_CURRENT_DESKTOP")
     if current_desktop:
         current_desktop = current_desktop.lower()
-        if current_desktop in ["gnome", "unity", "kde"]:
+        if current_desktop in ["gnome", "unity", "kde", "gnome-classic"]:
             return current_desktop
 
         # Special Cases
@@ -63,13 +64,9 @@ def get_desktop_environment():
     return "unknown"
 
 def is_running(process):
-    # From http://www.bloggerpolis.com/2011/05/how-to-check-if-a-process-is-running-using-python/
-    # and http://richarddingwall.name/2009/06/18/windows-equivalents-of-ps-and-kill-commands/
-    try: # Linux/Unix
-        s = subprocess.Popen(["ps", "axw"],stdout=subprocess.PIPE)
-    except: #Windows
-        s = subprocess.Popen(["tasklist", "/v"],stdout=subprocess.PIPE)
-    for x in s.stdout:
-        if re.search(process, str(x)):
-            return True
-    return False
+    try:
+        subprocess.check_output (["pidof", "--", process])
+        return True
+    except subprocess.CalledProcessError:
+        return False
+

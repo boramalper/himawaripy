@@ -106,18 +106,22 @@ def main():
     png.save(output_file, "PNG")
 
     de = get_desktop_environment()
-    if de in ["gnome", "unity", "cinnamon"]:
+    if de in ["gnome", "unity", "cinnamon", "pantheon", "gnome-classic"]:
         # Because of a bug and stupid design of gsettings, see http://askubuntu.com/a/418521/388226
         if de == "unity":
             call(["gsettings", "set", "org.gnome.desktop.background", "draw-background", "false"])
         call(["gsettings", "set", "org.gnome.desktop.background", "picture-uri", "file://" + output_file])
         call(["gsettings", "set", "org.gnome.desktop.background", "picture-options", "scaled"])
+        call(["gsettings", "set", "org.gnome.desktop.background", "primary-color", "FFFFFF"])
     elif de == "mate":
         call(["gsettings", "set", "org.mate.background", "picture-filename", output_file])
     elif de == "xfce4":
         call(["xfconf-query", "--channel", "xfce4-desktop", "--property", "/backdrop/screen0/monitor0/image-path", "--set", output_file])
     elif de == "lxde":
         call(["display", "-window", "root", output_file])
+    elif de == "mac":
+        call(["osascript","-e","tell application \"System Events\"\nset theDesktops to a reference to every desktop\nrepeat with aDesktop in theDesktops\nset the picture of aDesktop to \""+output_file+"\"\nend repeat\nend tell"])
+        call(["killall","Dock"])
     else:
         exit("Your desktop environment '{}' is not supported.".format(de))
 
