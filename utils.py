@@ -73,3 +73,13 @@ def is_running(process):
         if re.search(process, str(x)):
             return True
     return False
+
+def get_cache_dir():
+    if sys.platform.startswith("linux"):
+        cache_dir = os.environ.get("XDG_CACHE_HOME") or os.path.expanduser("~/.cache")
+    elif sys.platform.startswith("darwin"):
+        cache_dir = os.path.expanduser("~/Library/Caches")
+    else: # Windows?
+        cache_dir = os.path.expanduser("~/.cache")
+
+    return cache_dir
