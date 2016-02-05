@@ -51,7 +51,7 @@ Then you can install himawaripy:
     # set up a cronjob
     crontab -e
     # Add the line:
-    # */10 * * * * /home/USERNAME/himawaripy/himawaripy.py
+    */10 * * * * /home/USERNAME/himawaripy/himawaripy.py
     
 ### For KDE Users
 > So the issue here is that KDE does not support changing the desktop wallpaper
