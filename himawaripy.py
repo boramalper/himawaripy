@@ -77,7 +77,7 @@ def main():
         call(["gsettings", "set", "org.gnome.desktop.background", "picture-uri", "file://" + output_file])
         call(["gsettings", "set", "org.gnome.desktop.background", "picture-options", "scaled"])
     elif de == "mate":
-        call(["gconftool-2", "-type", "string", "-set", "/desktop/gnome/background/picture_filename", '"{}"'.format(output_file)])
+        call(["gsettings", "set", "org.mate.background", "picture-filename", output_file])
     elif de == "xfce4":
         call(["xfconf-query", "--channel", "xfce4-desktop", "--property", "/backdrop/screen0/monitor0/image-path", "--set", output_file])
     elif de == "lxde":

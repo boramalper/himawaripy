@@ -12,10 +12,10 @@ near-realtime picture of Earth.
 ## Supported Desktop Environments
 ### Tested
 * Unity 7
+* Mate 1.8.1
 
 ### Not Tested
 * GNOME 3
-* MATE
 * LXDE
 * KDE
 
