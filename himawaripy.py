@@ -16,6 +16,9 @@ from itertools import product
 
 import datetime
 from time import mktime, strptime
+import pytz
+from dateutil.relativedelta import *
+from tzlocal import get_localzone
 
 # Configuration
 # =============
@@ -24,7 +27,8 @@ from time import mktime, strptime
 level = 4
 width = 550
 height = 550
-hour_offset = 8
+auto_offset = True
+hour_offset = 0
 
 # Path to the output file
 output_file = expanduser("~/.himawari/himawari-latest.png")
@@ -32,6 +36,17 @@ output_file = expanduser("~/.himawari/himawari-latest.png")
 # ==============================================================================
 counter = None
 
+def get_time_offset():
+
+    local_date = datetime.datetime.now(pytz.timezone(str(local_tz)))
+    himawari_date = datetime.datetime.now(pytz.timezone('Australia/Sydney'))
+    local_offset = local_date.strftime("%z")
+    himawari_offset = himawari_date.strftime("%z")
+    
+    offset = int(local_offset) - int(himawari_offset);
+    offset = offset / 100
+
+    return offset
 
 def download_chunk(args):
     global counter
@@ -54,13 +69,21 @@ def main():
     print("Updating...")
     with urlopen("http://himawari8-dl.nict.go.jp/himawari8/img/D531106/latest.json") as latest_json:
         latest = strptime(loads(latest_json.read().decode("utf-8"))["date"], "%Y-%m-%d %H:%M:%S")
-        if (hour_offset > 0):
+        if (auto_offset):
+            offset = get_time_offset()
+            offset_tmp = datetime.datetime.fromtimestamp(mktime(latest))
+            offset_tmp = offset_tmp + datetime.timedelta(hours=offset)
+            print(offset_tmp)
+            offset_time = offset_tmp.timetuple()
+        elif (hour_offset > 0):
             offset_tmp = datetime.datetime.fromtimestamp(mktime(latest))
             offset_tmp = offset_tmp - datetime.timedelta(hours=hour_offset)
             offset_time = offset_tmp.timetuple()
 
+
+
     print("Latest version: {} GMT\n".format(strftime("%Y/%m/%d %H:%M:%S", latest)))
-    if (hour_offset > 0):
+    if (auto_offset | hour_offset != 0):
         print("Offset version: {} GMT\n".format(strftime("%Y/%m/%d %H:%M:%S", offset_time)))
 
     url_format = "http://himawari8.nict.go.jp/img/D531106/{}d/{}/{}_{}_{}.png"
@@ -70,7 +93,7 @@ def main():
     counter = Value("i", 0)
     p = Pool(cpu_count() * level)
     print("Downloading tiles: 0/{} completed".format(level*level), end="\r")
-    if (hour_offset > 0):
+    if (auto_offset | hour_offset > 0):
         res = p.map(download_chunk, product(range(level), range(level), (offset_time,)))
     else:
         res = p.map(download_chunk, product(range(level), range(level), (latest,)))
