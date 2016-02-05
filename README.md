@@ -14,10 +14,10 @@ near-realtime picture of Earth.
 * Unity 7
 * Mate 1.8.1
 * Pantheon
+* LXDE
 
 ### Not Tested
 * GNOME 3
-* LXDE
 * KDE
 * OS X
 
