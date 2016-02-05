@@ -70,7 +70,7 @@ def main():
     png.save(output_file, "PNG")
 
     de = get_desktop_environment()
-    if de in ["gnome", "unity", "cinnamon", "pantheon"]:
+    if de in ["gnome", "unity", "cinnamon", "pantheon", "gnome-classic"]:
         # Because of a bug and stupid design of gsettings, see http://askubuntu.com/a/418521/388226
         if de == "unity":
             call(["gsettings", "set", "org.gnome.desktop.background", "draw-background", "false"])
