@@ -67,6 +67,7 @@ def main():
         call(["display", "-window", "root", output_file])
     elif de == "mac":
         call(["osascript","-e","tell application \"System Events\"\nset theDesktops to a reference to every desktop\nrepeat with aDesktop in theDesktops\nset the picture of aDesktop to \""+output_file+"\"\nend repeat\nend tell"])
+        call(["killall","Dock"])
     else:
         exit("Your desktop environment '{}' is not supported.".format(de))
 
