@@ -33,6 +33,12 @@ time to download the tiles.
 You can also change the path of the latest picture, which is by default
 `~/.himawari/himawari-latest.png`, by changing the `output_file` variable.
 
+On xfce4, you can set which displays you want to change the background of using
+the xfce\_displays variable. If you get an error and you're not sure which
+display to use, you can find your display in the output of
+
+    xfconf-query --channel xfce4-desktop --list | grep last-image
+
 ## Installation
 Make sure that you have [pillow](https://python-pillow.github.io/) installed:
 
