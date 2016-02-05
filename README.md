@@ -32,6 +32,12 @@ You can also change the path of the latest picture, which is by default
 `~/.himawari/himawari-latest.png`, by changing the `output_file` variable.
 
 ## Installation
+Make sure that you have [pillow](https://python-pillow.github.io/) installed:
+
+    pip3 install pillow
+
+Then you can install himawaripy:
+
     cd ~
     git clone https://github.com/boramalper/himawaripy.git
     
