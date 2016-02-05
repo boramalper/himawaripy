@@ -82,6 +82,8 @@ def main():
         call(["xfconf-query", "--channel", "xfce4-desktop", "--property", "/backdrop/screen0/monitor0/image-path", "--set", output_file])
     elif de == "lxde":
         call(["display", "-window", "root", output_file])
+    elif de == "use_feh":
+        call(["feh", "--bg-fill", output_file])
     else:
         exit("Your desktop environment '{}' is not supported.".format(de))
 
