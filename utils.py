@@ -60,6 +60,10 @@ def get_desktop_environment():
             return "xfce4"
         elif current_desktop == "x-cinnamon":
             return "cinnamon"
+        # We seem to be running linux without a DM. Chances we are running 
+        # a tiling WM. Let's use feh to set the background.
+    else:
+            return "use_feh"
 
     return "unknown"
 

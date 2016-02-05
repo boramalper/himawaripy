@@ -1,0 +1,3 @@
+*.swp   # vim temp files
+__*     # Ignoring __pycache__/ and other crap
+__pycache__/
