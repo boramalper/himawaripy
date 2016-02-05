@@ -13,6 +13,7 @@ near-realtime picture of Earth.
 ### Tested
 * Unity 7
 * Mate 1.8.1
+* Pantheon
 
 ### Not Tested
 * GNOME 3
@@ -68,6 +69,23 @@ Then you can install himawaripy:
 >   depending on your download speed)
 
 Many thanks to [xenithorb](https://github.com/xenithorb) [for the solution](https://github.com/xenithorb/himawaripy/commit/01d7c681ae7ce47f639672733d0f734574662833)!
+
+## Uninstallation
+    # remove the cronjob
+    crontab -e
+    # Remove the line
+    */10 * * * * /home/USERNAME/himawaripy/himawaripy.py
+
+    # Remove the data directory
+    # By default, `~/.himawari`. Check `output_file` variable in himawaripy.py
+    # in case you've changed it.
+    rm -rf ~/.himawari
+
+    # Remove the installation folder
+    rm -rf ~/himawaripy
+
+If you would like to share why, you can contact me on github or
+[send an e-mail](mailto:bora@boramalper.org).
 
 ## Example
 ![Earth, as 2016/02/04/13:30:00 GMT](http://i.imgur.com/4XA6WaM.jpg)
