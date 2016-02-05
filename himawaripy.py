@@ -38,11 +38,11 @@ counter = None
 
 def get_time_offset():
 
-    local_date = datetime.datetime.now(pytz.timezone(str(local_tz)))
+    local_date = datetime.datetime.now(pytz.timezone(str(get_localzone())))
     himawari_date = datetime.datetime.now(pytz.timezone('Australia/Sydney'))
     local_offset = local_date.strftime("%z")
     himawari_offset = himawari_date.strftime("%z")
-    
+
     offset = int(local_offset) - int(himawari_offset);
     offset = offset / 100
 
