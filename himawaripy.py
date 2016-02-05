@@ -76,6 +76,7 @@ def main():
             call(["gsettings", "set", "org.gnome.desktop.background", "draw-background", "false"])
         call(["gsettings", "set", "org.gnome.desktop.background", "picture-uri", "file://" + output_file])
         call(["gsettings", "set", "org.gnome.desktop.background", "picture-options", "scaled"])
+        call(["gsettings", "set", "org.gnome.desktop.background", "primary-color", "FFFFFF"])
     elif de == "mate":
         call(["gsettings", "set", "org.mate.background", "picture-filename", output_file])
     elif de == "xfce4":
