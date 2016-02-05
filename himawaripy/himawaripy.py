@@ -10,7 +10,7 @@ from urllib.request import urlopen
 
 from PIL import Image
 
-from utils import get_desktop_environment
+from himawaripy.utils import get_desktop_environment
 from multiprocessing import Pool, cpu_count, Value
 from itertools import product
 
@@ -89,4 +89,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
