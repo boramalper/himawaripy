@@ -83,6 +83,7 @@ def main():
     elif de == "lxde":
         call(["display", "-window", "root", output_file])
     elif de == "use_feh":
+        print("\nYou seem to be using linux without a DE; Attempting to set backgroud with feh\n")
         call(["feh", "--bg-fill", output_file])
     else:
         exit("Your desktop environment '{}' is not supported.".format(de))
