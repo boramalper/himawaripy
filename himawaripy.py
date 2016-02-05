@@ -43,6 +43,31 @@ def download_chunk(args):
         print("Downloading tiles: {}/{} completed".format(counter.value, level*level), end="\r", flush=True)
     return (x, y,tiledata)
 
+def do_gnome():
+    call(["gsettings", "set", "org.gnome.desktop.background", "picture-uri", "file://" + output_file])
+    call(["gsettings", "set", "org.gnome.desktop.background", "picture-options", "scaled"])
+    call(["gsettings", "set", "org.gnome.desktop.background", "primary-color", "FFFFFF"])
+
+def do_unity():
+    # Because of a bug and stupid design of gsettings, see http://askubuntu.com/a/418521/388226
+    call(["gsettings", "set", "org.gnome.desktop.background", "draw-background", "false"])
+    do_gnome()
+
+def do_mate():
+    call(["gsettings", "set", "org.mate.background", "picture-filename", output_file])
+
+def do_xfce4():
+    call(["xfconf-query", "--channel", "xfce4-desktop", "--property", "/backdrop/screen0/monitor0/image-path", "--set", output_file])
+
+def do_lxde():
+    call(["display", "-window", "root", output_file])
+
+def do_mac():
+    call(["osascript","-e","tell application \"System Events\"\nset theDesktops to a reference to every desktop\nrepeat with aDesktop in theDesktops\nset the picture of aDesktop to \""+output_file+"\"\nend repeat\nend tell"])
+    call(["killall","Dock"])
+
+def do_feh():
+    call(["feh", "--bg-max", output_file])
 
 def main():
     global counter
@@ -69,27 +94,25 @@ def main():
     makedirs(split(output_file)[0], exist_ok=True)
     png.save(output_file, "PNG")
 
+    supported_DEs = {
+        "gnome": do_gnome,
+        "unity": do_unity,
+        "connamon": do_gnome,
+        "pantheon": do_gnome,
+        "gnome-classic": do_gnome,
+        "mate": do_mate,
+        "xfce4": do_xfce4,
+        "lxde": do_lxde,
+        "mac": do_mac,
+    }
+
     de = get_desktop_environment()
-    if de in ["gnome", "unity", "cinnamon", "pantheon", "gnome-classic"]:
-        # Because of a bug and stupid design of gsettings, see http://askubuntu.com/a/418521/388226
-        if de == "unity":
-            call(["gsettings", "set", "org.gnome.desktop.background", "draw-background", "false"])
-        call(["gsettings", "set", "org.gnome.desktop.background", "picture-uri", "file://" + output_file])
-        call(["gsettings", "set", "org.gnome.desktop.background", "picture-options", "scaled"])
-        call(["gsettings", "set", "org.gnome.desktop.background", "primary-color", "FFFFFF"])
-    elif de == "mate":
-        call(["gsettings", "set", "org.mate.background", "picture-filename", output_file])
-    elif de == "xfce4":
-        call(["xfconf-query", "--channel", "xfce4-desktop", "--property", "/backdrop/screen0/monitor0/image-path", "--set", output_file])
-    elif de == "lxde":
-        call(["display", "-window", "root", output_file])
-    elif de == "mac":
-        call(["osascript","-e","tell application \"System Events\"\nset theDesktops to a reference to every desktop\nrepeat with aDesktop in theDesktops\nset the picture of aDesktop to \""+output_file+"\"\nend repeat\nend tell"])
-        call(["killall","Dock"])
+    if de in supported_DEs:
+        supported_DEs[de]()
     elif has_program("feh"):
         print("\nCouldn't detect your desktop environment ('{}'), but you have"
               "'feh' installed so we will use it.".format(de))
-        call(["feh", "--bg-max", output_file])
+        do_feh()
     else:
         exit("Your desktop environment '{}' is not supported.".format(de))
 
