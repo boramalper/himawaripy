@@ -66,7 +66,7 @@ def main():
     elif de == "lxde":
         call(["display", "-window", "root", output_file])
     elif de == "mac":
-        call(["osascript","-e","tell application \"Finder\" to set desktop picture to POSIX file \""+output_file+"\""])
+        call(["osascript","-e","tell application \"System Events\"\nset theDesktops to a reference to every desktop\nrepeat with aDesktop in theDesktops\nset the picture of aDesktop to \""+output_file+"\"\nend repeat\nend tell"])
     else:
         exit("Your desktop environment '{}' is not supported.".format(de))
 
