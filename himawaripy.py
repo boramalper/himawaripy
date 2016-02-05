@@ -10,7 +10,7 @@ from urllib.request import urlopen
 
 from PIL import Image
 
-from utils import get_desktop_environment
+from utils import get_desktop_environment, has_program
 from multiprocessing import Pool, cpu_count, Value
 from itertools import product
 
@@ -86,6 +86,10 @@ def main():
     elif de == "mac":
         call(["osascript","-e","tell application \"System Events\"\nset theDesktops to a reference to every desktop\nrepeat with aDesktop in theDesktops\nset the picture of aDesktop to \""+output_file+"\"\nend repeat\nend tell"])
         call(["killall","Dock"])
+    elif has_program("feh"):
+        print("\nCouldn't detect your desktop environment ('{}'), but you have"
+              "'feh' installed so we will use it.".format(de))
+        call(["feh", "--bg-max", output_file])
     else:
         exit("Your desktop environment '{}' is not supported.".format(de))
 
