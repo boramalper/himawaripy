@@ -11,7 +11,7 @@ from urllib.request import urlopen
 from PIL import Image
 
 from utils import get_desktop_environment
-from multiprocessing import Pool, cpu_count
+from multiprocessing import Pool, cpu_count, Value
 from itertools import product
 
 # Configuration
@@ -26,18 +26,27 @@ height = 550
 output_file = expanduser("~/.himawari/himawari-latest.png")
 
 # ==============================================================================
+counter = None
+
 
 def download_chunk(args):
+    global counter
+
     x, y, latest = args
     url_format = "http://himawari8.nict.go.jp/img/D531106/{}d/{}/{}_{}_{}.png"
 
     with urlopen(url_format.format(level, width, strftime("%Y/%m/%d/%H%M%S", latest), x, y)) as tile_w:
         tiledata = tile_w.read()
 
+    with counter.get_lock():
+        counter.value += 1
+        print("Downloading tiles: {}/{} completed".format(counter.value, level*level), end="\r", flush=True)
     return (x, y,tiledata)
 
 
 def main():
+    global counter
+
     print("Updating...")
     with urlopen("http://himawari8-dl.nict.go.jp/himawari8/img/D531106/latest.json") as latest_json:
         latest = strptime(loads(latest_json.read().decode("utf-8"))["date"], "%Y-%m-%d %H:%M:%S")
@@ -48,9 +57,10 @@ def main():
 
     png = Image.new('RGB', (width*level, height*level))
 
+    counter = Value("i", 0)
     p = Pool(cpu_count() * level)
+    print("Downloading tiles: 0/{} completed".format(level*level), end="\r")
     res = p.map(download_chunk, product(range(level), range(level), (latest,)))
-
 
     for (x, y, tiledata) in res:
             tile = Image.open(BytesIO(tiledata))
@@ -75,7 +85,8 @@ def main():
     else:
         exit("Your desktop environment '{}' is not supported.".format(de))
 
-    print("Done!\n")
+    print("\nDone!\n")
 
 if __name__ == "__main__":
     main()
+
