@@ -19,6 +19,7 @@ near-realtime picture of Earth.
 * GNOME 3
 * LXDE
 * KDE
+* OS X
 
 ### Not Supported
 * any other desktop environments that are not mentioned above.
