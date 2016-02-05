@@ -62,7 +62,7 @@ def get_desktop_environment():
             return "cinnamon"
         # We seem to be running linux without a DM. Chances we are running 
         # a tiling WM. Let's use feh to set the background.
-    else:
+    elif has_program("feh"):
             return "use_feh"
 
     return "unknown"
@@ -74,3 +74,9 @@ def is_running(process):
     except subprocess.CalledProcessError:
         return False
 
+def has_program(program):
+    try:
+        subprocess.check_output(["which", "--", program])
+        return True
+    except subprocess.CalledProcessError:
+        return False
