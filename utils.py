@@ -64,13 +64,9 @@ def get_desktop_environment():
     return "unknown"
 
 def is_running(process):
-    # From http://www.bloggerpolis.com/2011/05/how-to-check-if-a-process-is-running-using-python/
-    # and http://richarddingwall.name/2009/06/18/windows-equivalents-of-ps-and-kill-commands/
-    try: # Linux/Unix
-        s = subprocess.Popen(["ps", "axw"],stdout=subprocess.PIPE)
-    except: #Windows
-        s = subprocess.Popen(["tasklist", "/v"],stdout=subprocess.PIPE)
-    for x in s.stdout:
-        if re.search(process, str(x)):
-            return True
-    return False
+    try:
+        subprocess.check_output (["pidof", "--", process])
+        return True
+    except subprocess.CalledProcessError:
+        return False
+
