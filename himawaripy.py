@@ -14,6 +14,9 @@ from utils import get_desktop_environment
 from multiprocessing import Pool, cpu_count, Value
 from itertools import product
 
+import datetime
+from time import mktime, strptime
+
 # Configuration
 # =============
 
@@ -21,6 +24,7 @@ from itertools import product
 level = 4
 width = 550
 height = 550
+hour_offset = 8
 
 # Path to the output file
 output_file = expanduser("~/.himawari/himawari-latest.png")
@@ -50,8 +54,14 @@ def main():
     print("Updating...")
     with urlopen("http://himawari8-dl.nict.go.jp/himawari8/img/D531106/latest.json") as latest_json:
         latest = strptime(loads(latest_json.read().decode("utf-8"))["date"], "%Y-%m-%d %H:%M:%S")
+        if (hour_offset > 0):
+            offset_tmp = datetime.datetime.fromtimestamp(mktime(latest))
+            offset_tmp = offset_tmp - datetime.timedelta(hours=hour_offset)
+            offset_time = offset_tmp.timetuple()
 
     print("Latest version: {} GMT\n".format(strftime("%Y/%m/%d %H:%M:%S", latest)))
+    if (hour_offset > 0):
+        print("Offset version: {} GMT\n".format(strftime("%Y/%m/%d %H:%M:%S", offset_time)))
 
     url_format = "http://himawari8.nict.go.jp/img/D531106/{}d/{}/{}_{}_{}.png"
 
@@ -60,7 +70,10 @@ def main():
     counter = Value("i", 0)
     p = Pool(cpu_count() * level)
     print("Downloading tiles: 0/{} completed".format(level*level), end="\r")
-    res = p.map(download_chunk, product(range(level), range(level), (latest,)))
+    if (hour_offset > 0):
+        res = p.map(download_chunk, product(range(level), range(level), (offset_time,)))
+    else:
+        res = p.map(download_chunk, product(range(level), range(level), (latest,)))
 
     for (x, y, tiledata) in res:
             tile = Image.open(BytesIO(tiledata))
@@ -89,4 +102,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
