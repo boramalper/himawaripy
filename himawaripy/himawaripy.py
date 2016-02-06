@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 
 from io import BytesIO
+from itertools import product
 from json import loads
-from time import strptime, strftime
-from subprocess import call
+from multiprocessing import Pool, cpu_count, Value
 from os import makedirs, environ
 from os.path import expanduser, split
+from subprocess import call
+from time import strptime, strftime
 from urllib.request import urlopen
 
 from PIL import Image
 
-from utils import get_desktop_environment, has_program
-from multiprocessing import Pool, cpu_count, Value
-from itertools import product
+from .utils import get_desktop_environment, has_program
 
 # Configuration
 # =============
