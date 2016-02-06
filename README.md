@@ -70,7 +70,7 @@ If you use nitrogen for setting your wallpaper, you have to enter this in your
     # or, alternatively use the provided systemd timer
     cp systemd/himawaripy.{service,timer} $HOME/.config/systemd/user/
     # enable and start the timer
-    systemctl --user enable --start himawaripy.timer
+    systemctl --user enable --now himawaripy.timer
     
 ### For KDE Users
 > So the issue here is that KDE does not support changing the desktop wallpaper
@@ -95,7 +95,7 @@ Many thanks to [xenithorb](https://github.com/xenithorb) [for the solution](http
     */10 * * * * /home/USERNAME/himawaripy/himawaripy.py
 
     # or if you used the systemd timer
-    systemctl --user disable himawaripy.timer
+    systemctl --user disable --now himawaripy.timer
     rm $HOME/.config/systemd/user/himawaripy.{timer,service}
 
     # Remove the data directory
