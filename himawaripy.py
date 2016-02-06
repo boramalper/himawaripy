@@ -91,6 +91,11 @@ def main():
               "'feh' installed so we will use it.".format(de))
         environ['DISPLAY'] = ':0'
         call(["feh", "--bg-max", output_file])
+    elif has_program("nitrogen"):
+        print("\nCouldn't detect your desktop environment ('{}'), but you have "
+              "'nitrogen' installed so we will use it.".format(de))
+        environ["DISPLAY"] = ':0'
+        call(["nitrogen", "--restore"])
     else:
         exit("Your desktop environment '{}' is not supported.".format(de))
 
