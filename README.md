@@ -59,8 +59,13 @@ If you use nitrogen for setting your wallpaper, you have to enter this in your
 
     # set up a cronjob
     crontab -e
+
+    # Get the installation path of himawaripy by running the command
+    #    which -- himawaripy
+    # on another terminal
+
     # Add the line:
-    */10 * * * * /usr/bin/himawaripy
+    */10 * * * * <INSTALLATION_PATH>
 
     # or, alternatively use the provided systemd timer
     cp systemd/himawaripy.{service,timer} $HOME/.config/systemd/user/
