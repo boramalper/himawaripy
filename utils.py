@@ -3,7 +3,7 @@
 import os
 import sys
 import subprocess
-import re
+
 
 def get_desktop_environment():
     # From http://stackoverflow.com/questions/2035657/what-is-my-current-desktop-environment
@@ -18,7 +18,7 @@ def get_desktop_environment():
         desktop_session = os.environ.get("DESKTOP_SESSION")
         if desktop_session is not None: # Easier to match if we don't have to deal with caracter cases
             desktop_session = desktop_session.lower()
-            if desktop_session in ["gnome", "unity", "cinnamon", "mate", "xfce4", "lxde", "fluxbox", 
+            if desktop_session in ["gnome", "unity", "cinnamon", "mate", "xfce4", "lxde", "fluxbox",
                                    "blackbox", "openbox", "icewm", "jwm", "afterstep","trinity", "kde", "pantheon",
                                    "gnome-classic"]:
                 return desktop_session
@@ -28,11 +28,11 @@ def get_desktop_environment():
             elif "xfce" in desktop_session or desktop_session.startswith("xubuntu"):
                 return "xfce4"
             elif desktop_session.startswith("ubuntu"):
-                return "unity"       
+                return "unity"
             elif desktop_session.startswith("lubuntu"):
-                return "lxde" 
-            elif desktop_session.startswith("kubuntu"): 
-                return "kde" 
+                return "lxde"
+            elif desktop_session.startswith("kubuntu"):
+                return "kde"
             elif desktop_session.startswith("razor"): # e.g. razorkwin
                 return "razor-qt"
             elif desktop_session.startswith("wmaker"): # e.g. wmaker-common
@@ -40,7 +40,7 @@ def get_desktop_environment():
         if os.environ.get('KDE_FULL_SESSION') == 'true':
             return "kde"
         elif os.environ.get('GNOME_DESKTOP_SESSION_ID'):
-            if not "deprecated" in os.environ.get('GNOME_DESKTOP_SESSION_ID'):
+            if "deprecated" not in os.environ.get('GNOME_DESKTOP_SESSION_ID'):
                 return "gnome2"
         # From http://ubuntuforums.org/showthread.php?t=652320
         elif is_running("xfce-mcs-manage"):
@@ -52,7 +52,7 @@ def get_desktop_environment():
     current_desktop = os.environ.get("XDG_CURRENT_DESKTOP")
     if current_desktop:
         current_desktop = current_desktop.lower()
-        if current_desktop in ["gnome", "unity", "kde", "gnome-classic"]:
+        if current_desktop in ["gnome", "unity", "kde", "gnome-classic", "mate"]:
             return current_desktop
 
         # Special Cases
@@ -61,6 +61,9 @@ def get_desktop_environment():
         elif current_desktop == "x-cinnamon":
             return "cinnamon"
 
+    return "unknown"
+
+
 def has_program(program):
     try:
         subprocess.check_output(["which", "--", program])
@@ -68,7 +71,6 @@ def has_program(program):
     except subprocess.CalledProcessError:
         return False
 
-    return "unknown"
 
 def is_running(process):
     try:
@@ -76,4 +78,3 @@ def is_running(process):
         return True
     except subprocess.CalledProcessError:
         return False
-

@@ -4,7 +4,7 @@ from io import BytesIO
 from json import loads
 from time import strptime, strftime
 from subprocess import call
-from os import makedirs
+from os import makedirs, environ
 from os.path import expanduser, split
 from urllib.request import urlopen
 
@@ -19,8 +19,6 @@ from itertools import product
 
 # Increases the quality and the size. Possible values: 4, 8, 16, 20
 level = 4
-width = 550
-height = 550
 
 # Path to the output file
 output_file = expanduser("~/.himawari/himawari-latest.png")
@@ -30,6 +28,8 @@ xfce_displays = [ "/backdrop/screen0/monitor0/workspace0/last-image" ]
 
 # ==============================================================================
 counter = None
+height = 550
+width = 550
 
 
 def download_chunk(args):
@@ -44,7 +44,7 @@ def download_chunk(args):
     with counter.get_lock():
         counter.value += 1
         print("Downloading tiles: {}/{} completed".format(counter.value, level*level), end="\r", flush=True)
-    return (x, y,tiledata)
+    return x, y, tiledata
 
 
 def main():
@@ -55,8 +55,6 @@ def main():
         latest = strptime(loads(latest_json.read().decode("utf-8"))["date"], "%Y-%m-%d %H:%M:%S")
 
     print("Latest version: {} GMT\n".format(strftime("%Y/%m/%d %H:%M:%S", latest)))
-
-    url_format = "http://himawari8.nict.go.jp/img/D531106/{}d/{}/{}_{}_{}.png"
 
     png = Image.new('RGB', (width*level, height*level))
 
@@ -86,14 +84,22 @@ def main():
         for display in xfce_displays:
             call(["xfconf-query", "--channel", "xfce4-desktop", "--property", display, "--set", output_file])
     elif de == "lxde":
-        call(["display", "-window", "root", output_file])
+        call(["pcmanfm", "--set-wallpaper", output_file, "--wallpaper-mode=fit",])
     elif de == "mac":
-        call(["osascript","-e","tell application \"System Events\"\nset theDesktops to a reference to every desktop\nrepeat with aDesktop in theDesktops\nset the picture of aDesktop to \""+output_file+"\"\nend repeat\nend tell"])
-        call(["killall","Dock"])
+        call(["osascript", "-e", 'tell application "System Events"\nset theDesktops to a reference to every desktop\n'
+              'repeat with aDesktop in theDesktops\n'
+              'set the picture of aDesktop to \"' + output_file + '"\nend repeat\nend tell'])
+        call(["killall", "Dock"])
     elif has_program("feh"):
         print("\nCouldn't detect your desktop environment ('{}'), but you have"
               "'feh' installed so we will use it.".format(de))
+        environ['DISPLAY'] = ':0'
         call(["feh", "--bg-max", output_file])
+    elif has_program("nitrogen"):
+        print("\nCouldn't detect your desktop environment ('{}'), but you have "
+              "'nitrogen' installed so we will use it.".format(de))
+        environ["DISPLAY"] = ':0'
+        call(["nitrogen", "--restore"])
     else:
         exit("Your desktop environment '{}' is not supported.".format(de))
 
@@ -101,4 +107,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
