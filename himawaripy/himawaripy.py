@@ -28,7 +28,7 @@ xfce_displays = [ "/backdrop/screen0/monitor0/image-path",
                   "/backdrop/screen0/monitor0/workspace0/last-image" ]
 
 # ==============================================================================
-counter = None
+counter = Value("i", 0)
 height = 550
 width = 550
 
@@ -59,7 +59,6 @@ def main():
 
     png = Image.new('RGB', (width*level, height*level))
 
-    counter = Value("i", 0)
     p = Pool(cpu_count() * level)
     print("Downloading tiles: 0/{} completed".format(level*level), end="\r")
     res = p.map(download_chunk, product(range(level), range(level), (latest,)))
