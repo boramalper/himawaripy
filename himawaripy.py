@@ -24,7 +24,8 @@ level = 4
 output_file = expanduser("~/.himawari/himawari-latest.png")
 
 # xfce4 displays to change the background of
-xfce_displays = [ "/backdrop/screen0/monitor0/workspace0/last-image" ]
+xfce_displays = [ "/backdrop/screen0/monitor0/image-path",
+                  "/backdrop/screen0/monitor0/workspace0/last-image" ]
 
 # ==============================================================================
 counter = None
