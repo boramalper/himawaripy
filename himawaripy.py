@@ -19,14 +19,14 @@ from itertools import product
 
 # Increases the quality and the size. Possible values: 4, 8, 16, 20
 level = 4
-width = 550
-height = 550
 
 # Path to the output file
 output_file = expanduser("~/.himawari/himawari-latest.png")
 
 # ==============================================================================
 counter = None
+height = 550
+width = 550
 
 
 def download_chunk(args):
