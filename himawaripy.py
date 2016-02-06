@@ -4,7 +4,7 @@ from io import BytesIO
 from json import loads
 from time import strptime, strftime
 from subprocess import call
-from os import makedirs
+from os import makedirs, environ
 from os.path import expanduser, split
 from urllib.request import urlopen
 
@@ -89,6 +89,7 @@ def main():
     elif has_program("feh"):
         print("\nCouldn't detect your desktop environment ('{}'), but you have"
               "'feh' installed so we will use it.".format(de))
+        environ['DISPLAY'] = ':0'
         call(["feh", "--bg-max", output_file])
     else:
         exit("Your desktop environment '{}' is not supported.".format(de))
