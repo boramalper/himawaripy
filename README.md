@@ -43,11 +43,6 @@ If you use nitrogen for setting your wallpaper, you have to enter this in your
     bgcolor=#000000
 
 ## Installation
-Make sure that you have [pillow](https://python-pillow.github.io/) installed:
-
-    pip3 install pillow
-
-Then you can install himawaripy:
 
     cd ~
     git clone https://github.com/boramalper/himawaripy.git
@@ -56,13 +51,21 @@ Then you can install himawaripy:
     cd ~/himawaripy
     vi himawaripy.py
     
+    # install
+    sudo python setup.py install
+
     # test whether it's working
-    ./himawaripy.py
-    
+    himawaripy
+
     # set up a cronjob
     crontab -e
     # Add the line:
-    */10 * * * * /home/USERNAME/himawaripy/himawaripy.py
+    */10 * * * * /usr/bin/himawaripy
+
+    # or, alternatively use the provided systemd timer
+    cp systemd/himawaripy.{service,timer} $HOME/.config/systemd/user/
+    # enable and start the timer
+    systemctl --user enable --start himawaripy.timer
     
 ### For KDE Users
 > So the issue here is that KDE does not support changing the desktop wallpaper
@@ -86,13 +89,17 @@ Many thanks to [xenithorb](https://github.com/xenithorb) [for the solution](http
     # Remove the line
     */10 * * * * /home/USERNAME/himawaripy/himawaripy.py
 
+    # or if you used the systemd timer
+    systemctl --user disable himawaripy.timer
+    rm $HOME/.config/systemd/user/himawaripy.{timer,service}
+
     # Remove the data directory
     # By default, `~/.himawari`. Check `output_file` variable in himawaripy.py
     # in case you've changed it.
     rm -rf ~/.himawari
 
-    # Remove the installation folder
-    rm -rf ~/himawaripy
+    # Uninstall the package
+    sudo pip uninstall himawaripy
 
 If you would like to share why, you can contact me on github or
 [send an e-mail](mailto:bora@boramalper.org).
