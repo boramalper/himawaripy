@@ -34,27 +34,27 @@ You can also change the path of the latest picture, which is by default
 `~/.himawari/himawari-latest.png`, by changing the `output_file` variable.
 
 ## Installation
-Make sure that you have [pillow](https://python-pillow.github.io/) installed:
+Make sure that you have [pillow](https://python-pillow.github.io/), dateutil, pytz, datetime, tzlocal installed:
 
-    pip3 install pillow
+    pip3 install pillow python-dateutil pytz datetime tzlocal
 
 Then you can install himawaripy:
 
     cd ~
     git clone https://github.com/boramalper/himawaripy.git
-    
+
     # configure
     cd ~/himawaripy
     vi himawaripy.py
-    
+
     # test whether it's working
     ./himawaripy.py
-    
+
     # set up a cronjob
     crontab -e
     # Add the line:
     */10 * * * * /home/USERNAME/himawaripy/himawaripy.py
-    
+
 ### For KDE Users
 > So the issue here is that KDE does not support changing the desktop wallpaper
 > from the commandline, but it does support polling a directory for file changes
@@ -90,7 +90,7 @@ If you would like to share why, you can contact me on github or
 
 ## Example
 ![Earth, as 2016/02/04/13:30:00 GMT](http://i.imgur.com/4XA6WaM.jpg)
-    
+
 ## Attributions
 Thanks to *[MichaelPote](https://github.com/MichaelPote)* for the [initial
 implementation](https://gist.github.com/MichaelPote/92fa6e65eacf26219022) using
