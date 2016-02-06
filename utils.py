@@ -61,6 +61,8 @@ def get_desktop_environment():
         elif current_desktop == "x-cinnamon":
             return "cinnamon"
 
+    return "unknown"
+
 
 def has_program(program):
     try:
@@ -68,8 +70,6 @@ def has_program(program):
         return True
     except subprocess.CalledProcessError:
         return False
-
-    return "unknown"
 
 
 def is_running(process):
