@@ -15,6 +15,7 @@ near-realtime picture of Earth.
 * Mate 1.8.1
 * Pantheon
 * LXDE
+* Windows (7)
 
 ### Not Tested
 * GNOME 3
