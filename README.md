@@ -37,13 +37,10 @@ You can also change the path of the latest picture, which is by default
 If you use nitrogen for setting your wallpaper, you have to enter this in your
 `~/.config/nitrogen/bg-saved.cfg`.
 
-```
-[:0.0]
-file=/home/<user>/.himawari/himawari-latest.png
-mode=4
-bgcolor=#000000
-
-```
+    [:0.0]
+    file=/home/USERNAME/.himawari/himawari-latest.png
+    mode=4
+    bgcolor=#000000
 
 ## Installation
 Make sure that you have [pillow](https://python-pillow.github.io/) installed:
