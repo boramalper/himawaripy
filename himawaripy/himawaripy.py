@@ -5,7 +5,7 @@ from itertools import product
 from json import loads
 from multiprocessing import Pool, cpu_count, Value
 from os import makedirs, environ
-from os.path import expanduser, split
+from os.path import expanduser, split, splitext
 from subprocess import call
 from time import strptime, strftime
 from urllib.request import urlopen
@@ -69,9 +69,13 @@ def main():
             png.paste(tile, (width*x, height*y, width*(x+1), height*(y+1)))
 
     makedirs(split(output_file)[0], exist_ok=True)
-    png.save(output_file, "PNG")
-
     de = get_desktop_environment()
+
+    if de == "windows":
+        png.save(splitext(output_file)[0] + ".jpg", "JPEG", quality=100)
+    else:
+        png.save(output_file, "PNG")
+
     if de in ["gnome", "unity", "cinnamon", "pantheon", "gnome-classic"]:
         # Because of a bug and stupid design of gsettings, see http://askubuntu.com/a/418521/388226
         if de == "unity":
@@ -91,6 +95,13 @@ def main():
               'repeat with aDesktop in theDesktops\n'
               'set the picture of aDesktop to \"' + output_file + '"\nend repeat\nend tell'])
         call(["killall", "Dock"])
+    elif de == "windows":
+        import ctypes
+        SPI_SETDESKWALLPAPER = 20
+        SPIF_UPDATEINIFILE = 0x01
+        SPIF_SENDWININICHANGE = 0x02
+        ctypes.windll.user32.SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0,
+            splitext(output_file)[0] + ".jpg", SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE)
     elif has_program("feh"):
         print("\nCouldn't detect your desktop environment ('{}'), but you have"
               "'feh' installed so we will use it.".format(de))
