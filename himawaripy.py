@@ -24,7 +24,7 @@ from tzlocal import get_localzone
 # =============
 
 # Increases the quality and the size. Possible values: 4, 8, 16, 20
-level = 4
+level = 8
 width = 550
 height = 550
 auto_offset = True
@@ -73,7 +73,6 @@ def main():
             offset = get_time_offset()
             offset_tmp = datetime.datetime.fromtimestamp(mktime(latest))
             offset_tmp = offset_tmp + datetime.timedelta(hours=offset)
-            print(offset_tmp)
             offset_time = offset_tmp.timetuple()
         elif (hour_offset > 0):
             offset_tmp = datetime.datetime.fromtimestamp(mktime(latest))
