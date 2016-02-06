@@ -76,7 +76,6 @@ def main():
             offset = get_time_offset()
             offset_tmp = datetime.datetime.fromtimestamp(mktime(latest))
             offset_tmp = offset_tmp + datetime.timedelta(hours=offset)
-            print(offset_tmp)
             offset_time = offset_tmp.timetuple()
         elif (hour_offset > 0):
             offset_tmp = datetime.datetime.fromtimestamp(mktime(latest))
