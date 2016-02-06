@@ -23,6 +23,10 @@ level = 4
 # Path to the output file
 output_file = expanduser("~/.himawari/himawari-latest.png")
 
+# xfce4 displays to change the background of
+xfce_displays = [ "/backdrop/screen0/monitor0/image-path",
+                  "/backdrop/screen0/monitor0/workspace0/last-image" ]
+
 # ==============================================================================
 counter = None
 height = 550
@@ -78,7 +82,8 @@ def main():
     elif de == "mate":
         call(["gsettings", "set", "org.mate.background", "picture-filename", output_file])
     elif de == "xfce4":
-        call(["xfconf-query", "--channel", "xfce4-desktop", "--property", "/backdrop/screen0/monitor0/image-path", "--set", output_file])
+        for display in xfce_displays:
+            call(["xfconf-query", "--channel", "xfce4-desktop", "--property", display, "--set", output_file])
     elif de == "lxde":
         call(["pcmanfm", "--set-wallpaper", output_file, "--wallpaper-mode=fit",])
     elif de == "mac":
