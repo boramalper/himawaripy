@@ -14,10 +14,10 @@ near-realtime picture of Earth.
 * Unity 7
 * Mate 1.8.1
 * Pantheon
+* LXDE
 
 ### Not Tested
 * GNOME 3
-* LXDE
 * KDE
 * OS X
 
@@ -32,6 +32,15 @@ time to download the tiles.
 
 You can also change the path of the latest picture, which is by default
 `~/.himawari/himawari-latest.png`, by changing the `output_file` variable.
+
+### Nitrogen
+If you use nitrogen for setting your wallpaper, you have to enter this in your
+`~/.config/nitrogen/bg-saved.cfg`.
+
+    [:0.0]
+    file=/home/USERNAME/.himawari/himawari-latest.png
+    mode=4
+    bgcolor=#000000
 
 ## Installation
 
