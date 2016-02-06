@@ -18,7 +18,7 @@ def get_desktop_environment():
         desktop_session = os.environ.get("DESKTOP_SESSION")
         if desktop_session is not None: # Easier to match if we don't have to deal with caracter cases
             desktop_session = desktop_session.lower()
-            if desktop_session in ["gnome", "unity", "cinnamon", "mate", "xfce4", "lxde", "fluxbox", 
+            if desktop_session in ["gnome", "unity", "cinnamon", "mate", "xfce4", "lxde", "fluxbox",
                                    "blackbox", "openbox", "icewm", "jwm", "afterstep","trinity", "kde", "pantheon",
                                    "gnome-classic"]:
                 return desktop_session
@@ -28,11 +28,11 @@ def get_desktop_environment():
             elif "xfce" in desktop_session or desktop_session.startswith("xubuntu"):
                 return "xfce4"
             elif desktop_session.startswith("ubuntu"):
-                return "unity"       
+                return "unity"
             elif desktop_session.startswith("lubuntu"):
-                return "lxde" 
-            elif desktop_session.startswith("kubuntu"): 
-                return "kde" 
+                return "lxde"
+            elif desktop_session.startswith("kubuntu"):
+                return "kde"
             elif desktop_session.startswith("razor"): # e.g. razorkwin
                 return "razor-qt"
             elif desktop_session.startswith("wmaker"): # e.g. wmaker-common
@@ -52,7 +52,7 @@ def get_desktop_environment():
     current_desktop = os.environ.get("XDG_CURRENT_DESKTOP")
     if current_desktop:
         current_desktop = current_desktop.lower()
-        if current_desktop in ["gnome", "unity", "kde", "gnome-classic"]:
+        if current_desktop in ["gnome", "unity", "kde", "gnome-classic", "mate"]:
             return current_desktop
 
         # Special Cases
