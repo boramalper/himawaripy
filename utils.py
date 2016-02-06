@@ -3,7 +3,7 @@
 import os
 import sys
 import subprocess
-import re
+
 
 def get_desktop_environment():
     # From http://stackoverflow.com/questions/2035657/what-is-my-current-desktop-environment
@@ -40,7 +40,7 @@ def get_desktop_environment():
         if os.environ.get('KDE_FULL_SESSION') == 'true':
             return "kde"
         elif os.environ.get('GNOME_DESKTOP_SESSION_ID'):
-            if not "deprecated" in os.environ.get('GNOME_DESKTOP_SESSION_ID'):
+            if "deprecated" not in os.environ.get('GNOME_DESKTOP_SESSION_ID'):
                 return "gnome2"
         # From http://ubuntuforums.org/showthread.php?t=652320
         elif is_running("xfce-mcs-manage"):
@@ -61,6 +61,7 @@ def get_desktop_environment():
         elif current_desktop == "x-cinnamon":
             return "cinnamon"
 
+
 def has_program(program):
     try:
         subprocess.check_output(["which", "--", program])
@@ -70,10 +71,10 @@ def has_program(program):
 
     return "unknown"
 
+
 def is_running(process):
     try:
         subprocess.check_output (["pidof", "--", process])
         return True
     except subprocess.CalledProcessError:
         return False
-
