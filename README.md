@@ -68,24 +68,26 @@ If you use nitrogen for setting your wallpaper, you have to enter this in your
     # Get the installation path of himawaripy by running the command
     which -- himawaripy
 
-    # Set up a cronjob
-    crontab -e
-
-    ## Add the line:
-    */10 * * * * <INSTALLATION_PATH>
-
-    # OR, alternatively use the provided systemd timer
+    # Set himawaripy to be called periodically
     
-    ## Configure
-    vi ../systemd/himawaripy.service
-    # Replace "<INSTALLATION_PATH>" with the output of the aforementioned command.
+        ## Either set up a cronjob
+            crontab -e
+            
+            ### Add the line:
+            */10 * * * * <INSTALLATION_PATH>
     
-    # Copy systemd configuration
-    cp systemd/himawaripy.{service,timer} $HOME/.config/systemd/user/
-    
-    # Enable and start the timer
-    systemctl --user enable --now himawaripy.timer
-    
+        ## OR, alternatively use the provided systemd timer
+        
+            ### Configure
+            vi ../systemd/himawaripy.service
+            # Replace "<INSTALLATION_PATH>" with the output of the aforementioned command.
+            
+            ### Copy systemd configuration
+            cp systemd/himawaripy.{service,timer} $HOME/.config/systemd/user/
+            
+            ### Enable and start the timer
+            systemctl --user enable --now himawaripy.timer
+        
 ### For KDE Users
 > So the issue here is that KDE does not support changing the desktop wallpaper
 > from the commandline, but it does support polling a directory for file changes
@@ -103,12 +105,12 @@ If you use nitrogen for setting your wallpaper, you have to enter this in your
 Many thanks to [xenithorb](https://github.com/xenithorb) [for the solution](https://github.com/xenithorb/himawaripy/commit/01d7c681ae7ce47f639672733d0f734574662833)!
 
 ## Uninstallation
-    # remove the cronjob
+    # Remove the cronjob
     crontab -e
     # Remove the line
     */10 * * * * <INSTALLATION_PATH>
 
-    # or if you used the systemd timer
+    # OR if you used the systemd timer
     systemctl --user disable --now himawaripy.timer
     rm $HOME/.config/systemd/user/himawaripy.{timer,service}
 
