@@ -56,11 +56,11 @@ If you use nitrogen for setting your wallpaper, you have to enter this in your
     git clone https://github.com/boramalper/himawaripy.git
     
     # configure
-    cd ~/himawaripy/himawaripy
-    vi config.py
+    cd ~/himawaripy/
+    vi himawaripy/config.py
     
     # install
-    sudo python setup.py install
+    sudo python3 setup.py install
 
     # test whether it's working
     himawaripy
@@ -79,7 +79,7 @@ If you use nitrogen for setting your wallpaper, you have to enter this in your
         ## OR, alternatively use the provided systemd timer
         
             ### Configure
-            vi ../systemd/himawaripy.service
+            vi systemd/himawaripy.service
             # Replace "<INSTALLATION_PATH>" with the output of the aforementioned command.
             
             ### Copy systemd configuration
@@ -120,7 +120,7 @@ Many thanks to [xenithorb](https://github.com/xenithorb) [for the solution](http
     rm -rf ~/.himawari
 
     # Uninstall the package
-    sudo pip uninstall himawaripy
+    sudo pip3 uninstall himawaripy
 
 If you would like to share why, you can contact me on github or
 [send an e-mail](mailto:bora@boramalper.org).
