@@ -1,10 +1,50 @@
-# http://stackoverflow.com/a/21213358/4466589
-
 import os
 import sys
 import subprocess
 
+from .config import xfce_displays
 
+
+def set_background(file_path):
+    de = get_desktop_environment()
+
+    if de in ["gnome", "unity", "cinnamon", "pantheon", "gnome-classic"]:
+        # Because of a bug and stupid design of gsettings, see http://askubuntu.com/a/418521/388226
+        if de == "unity":
+            subprocess.call(["gsettings", "set", "org.gnome.desktop.background", "draw-background", "false"])
+        subprocess.call(["gsettings", "set", "org.gnome.desktop.background", "picture-uri", "file://" + file_path])
+        subprocess.call(["gsettings", "set", "org.gnome.desktop.background", "picture-options", "scaled"])
+        subprocess.call(["gsettings", "set", "org.gnome.desktop.background", "primary-color", "FFFFFF"])
+    elif de == "mate":
+        subprocess.call(["gsettings", "set", "org.mate.background", "picture-filename", file_path])
+    elif de == "xfce4":
+        for display in xfce_displays:
+            subprocess.call(["xfconf-query", "--channel", "xfce4-desktop", "--property", display, "--set", file_path])
+    elif de == "lxde":
+        subprocess.call(["pcmanfm", "--set-wallpaper", file_path, "--wallpaper-mode=fit", ])
+    elif de == "mac":
+        subprocess.call(["osascript", "-e", 'tell application "System Events"\n'
+                         'set theDesktops to a reference to every desktop\n'
+                         'repeat with aDesktop in theDesktops\n'
+                         'set the picture of aDesktop to \"' + file_path + '"\nend repeat\nend tell'])
+        subprocess.call(["killall", "Dock"])
+    elif has_program("feh"):
+        print("\nCouldn't detect your desktop environment ('{}'), but you have"
+              "'feh' installed so we will use it.".format(de))
+        os.environ['DISPLAY'] = ':0'
+        subprocess.call(["feh", "--bg-max", file_path])
+    elif has_program("nitrogen"):
+        print("\nCouldn't detect your desktop environment ('{}'), but you have "
+              "'nitrogen' installed so we will use it.".format(de))
+        os.environ["DISPLAY"] = ':0'
+        subprocess.call(["nitrogen", "--restore"])
+    else:
+        return False
+
+    return True
+
+
+# http://stackoverflow.com/a/21213358/4466589
 def get_desktop_environment():
     # From http://stackoverflow.com/questions/2035657/what-is-my-current-desktop-environment
     # and http://ubuntuforums.org/showthread.php?t=652320

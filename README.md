@@ -56,8 +56,8 @@ If you use nitrogen for setting your wallpaper, you have to enter this in your
     git clone https://github.com/boramalper/himawaripy.git
     
     # configure
-    cd ~/himawaripy
-    vi himawaripy.py
+    cd ~/himawaripy/himawaripy
+    vi config.py
     
     # install
     sudo python setup.py install
@@ -65,19 +65,25 @@ If you use nitrogen for setting your wallpaper, you have to enter this in your
     # test whether it's working
     himawaripy
 
-    # set up a cronjob
+    # Get the installation path of himawaripy by running the command
+    which -- himawaripy
+
+    # Set up a cronjob
     crontab -e
 
-    # Get the installation path of himawaripy by running the command
-    #    which -- himawaripy
-    # on another terminal
-
-    # Add the line:
+    ## Add the line:
     */10 * * * * <INSTALLATION_PATH>
 
-    # or, alternatively use the provided systemd timer
+    # OR, alternatively use the provided systemd timer
+    
+    ## Configure
+    vi ../systemd/himawaripy.service
+    # Replace "<INSTALLATION_PATH>" with the output of the aforementioned command.
+    
+    # Copy systemd configuration
     cp systemd/himawaripy.{service,timer} $HOME/.config/systemd/user/
-    # enable and start the timer
+    
+    # Enable and start the timer
     systemctl --user enable --now himawaripy.timer
     
 ### For KDE Users
@@ -100,14 +106,14 @@ Many thanks to [xenithorb](https://github.com/xenithorb) [for the solution](http
     # remove the cronjob
     crontab -e
     # Remove the line
-    */10 * * * * /home/USERNAME/himawaripy/himawaripy.py
+    */10 * * * * <INSTALLATION_PATH>
 
     # or if you used the systemd timer
     systemctl --user disable --now himawaripy.timer
     rm $HOME/.config/systemd/user/himawaripy.{timer,service}
 
     # Remove the data directory
-    # By default, `~/.himawari`. Check `output_file` variable in himawaripy.py
+    # By default, `~/.himawari`. Check `output_file` variable in config.py
     # in case you've changed it.
     rm -rf ~/.himawari
 

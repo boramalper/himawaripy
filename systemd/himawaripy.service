@@ -5,4 +5,4 @@ Description=Update desktop background with satellite imagery
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/himawaripy
+ExecStart=<INSTALLATION_PATH>

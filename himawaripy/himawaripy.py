@@ -4,30 +4,16 @@ from io import BytesIO
 from itertools import product
 from json import loads
 from multiprocessing import Pool, cpu_count, Value
-from os import makedirs, environ
-from os.path import expanduser, split
-from subprocess import call
+from os import makedirs
+from os.path import split
 from time import strptime, strftime
 from urllib.request import urlopen
 
 from PIL import Image
 
-from .utils import get_desktop_environment, has_program
+from .config import level, output_file
+from .utils import set_background, get_desktop_environment
 
-# Configuration
-# =============
-
-# Increases the quality and the size. Possible values: 4, 8, 16, 20
-level = 4
-
-# Path to the output file
-output_file = expanduser("~/.himawari/himawari-latest.png")
-
-# xfce4 displays to change the background of
-xfce_displays = [ "/backdrop/screen0/monitor0/image-path",
-                  "/backdrop/screen0/monitor0/workspace0/last-image" ]
-
-# ==============================================================================
 counter = None
 height = 550
 width = 550
@@ -71,40 +57,10 @@ def main():
     makedirs(split(output_file)[0], exist_ok=True)
     png.save(output_file, "PNG")
 
-    de = get_desktop_environment()
-    if de in ["gnome", "unity", "cinnamon", "pantheon", "gnome-classic"]:
-        # Because of a bug and stupid design of gsettings, see http://askubuntu.com/a/418521/388226
-        if de == "unity":
-            call(["gsettings", "set", "org.gnome.desktop.background", "draw-background", "false"])
-        call(["gsettings", "set", "org.gnome.desktop.background", "picture-uri", "file://" + output_file])
-        call(["gsettings", "set", "org.gnome.desktop.background", "picture-options", "scaled"])
-        call(["gsettings", "set", "org.gnome.desktop.background", "primary-color", "FFFFFF"])
-    elif de == "mate":
-        call(["gsettings", "set", "org.mate.background", "picture-filename", output_file])
-    elif de == "xfce4":
-        for display in xfce_displays:
-            call(["xfconf-query", "--channel", "xfce4-desktop", "--property", display, "--set", output_file])
-    elif de == "lxde":
-        call(["pcmanfm", "--set-wallpaper", output_file, "--wallpaper-mode=fit",])
-    elif de == "mac":
-        call(["osascript", "-e", 'tell application "System Events"\nset theDesktops to a reference to every desktop\n'
-              'repeat with aDesktop in theDesktops\n'
-              'set the picture of aDesktop to \"' + output_file + '"\nend repeat\nend tell'])
-        call(["killall", "Dock"])
-    elif has_program("feh"):
-        print("\nCouldn't detect your desktop environment ('{}'), but you have"
-              "'feh' installed so we will use it.".format(de))
-        environ['DISPLAY'] = ':0'
-        call(["feh", "--bg-max", output_file])
-    elif has_program("nitrogen"):
-        print("\nCouldn't detect your desktop environment ('{}'), but you have "
-              "'nitrogen' installed so we will use it.".format(de))
-        environ["DISPLAY"] = ':0'
-        call(["nitrogen", "--restore"])
-    else:
-        exit("Your desktop environment '{}' is not supported.".format(de))
+    if not set_background(output_file):
+        exit("\nYour desktop environment '{}' is not supported.".format(get_desktop_environment()))
 
-    print("\nDone!\n")
+    print("\nDone!")
 
 if __name__ == "__main__":
     main()
