@@ -1,0 +1,11 @@
+# $HOME/.config/user/systemd/himawaripy.timer
+
+[Unit]
+Description=Run himawaripy every 10 minutes
+
+[Timer]
+OnCalendar=*:0/10
+Persistent=true
+
+[Install]
+WantedBy=timers.target
