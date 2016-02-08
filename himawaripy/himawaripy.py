@@ -24,17 +24,26 @@ counter = None
 height = 550
 width = 550
 
-def get_time_offset():
+def get_time_offset(latest_date):
+    if (auto_offset):
+        local_date = datetime.datetime.now(pytz.timezone(str(get_localzone())))
+        himawari_date = datetime.datetime.now(pytz.timezone('Australia/Sydney'))
+        local_offset = local_date.strftime("%z")
+        himawari_offset = himawari_date.strftime("%z")
 
-    local_date = datetime.datetime.now(pytz.timezone(str(get_localzone())))
-    himawari_date = datetime.datetime.now(pytz.timezone('Australia/Sydney'))
-    local_offset = local_date.strftime("%z")
-    himawari_offset = himawari_date.strftime("%z")
+        offset = int(local_offset) - int(himawari_offset);
+        offset = offset / 100
 
-    offset = int(local_offset) - int(himawari_offset);
-    offset = offset / 100
+        offset_tmp = datetime.datetime.fromtimestamp(mktime(latest_date))
+        offset_tmp = offset_tmp + datetime.timedelta(hours=offset)
+        offset_time = offset_tmp.timetuple()
 
-    return offset
+    elif (hour_offset > 0):
+        offset_tmp = datetime.datetime.fromtimestamp(mktime(latest_date))
+        offset_tmp = offset_tmp - datetime.timedelta(hours=hour_offset)
+        offset_time = offset_tmp.timetuple()
+
+    return offset_time
 
 def download_chunk(args):
     global counter
@@ -57,18 +66,11 @@ def main():
     print("Updating...")
     with urlopen("http://himawari8-dl.nict.go.jp/himawari8/img/D531106/latest.json") as latest_json:
         latest = strptime(loads(latest_json.read().decode("utf-8"))["date"], "%Y-%m-%d %H:%M:%S")
-        if (auto_offset):
-            offset = get_time_offset()
-            offset_tmp = datetime.datetime.fromtimestamp(mktime(latest))
-            offset_tmp = offset_tmp + datetime.timedelta(hours=offset)
-            offset_time = offset_tmp.timetuple()
-        elif (hour_offset > 0):
-            offset_tmp = datetime.datetime.fromtimestamp(mktime(latest))
-            offset_tmp = offset_tmp - datetime.timedelta(hours=hour_offset)
-            offset_time = offset_tmp.timetuple()
+
 
     print("Latest version: {} GMT\n".format(strftime("%Y/%m/%d %H:%M:%S", latest)))
-    if (auto_offset | hour_offset != 0):
+    if (auto_offset | hour_offset > 0):
+        offset_time = get_time_offset(latest)
         print("Offset version: {} GMT\n".format(strftime("%Y/%m/%d %H:%M:%S", offset_time)))
 
     png = Image.new('RGB', (width*level, height*level))

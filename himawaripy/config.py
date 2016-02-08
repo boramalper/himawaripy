@@ -5,7 +5,7 @@ level = 4
 
 #Define a ourly offset or let the script calculate it depending on your timezone
 auto_offset = False
-hour_offset = 2
+hour_offset = 0
 
 # Path to the output file
 output_file = expanduser("~/.himawari/himawari-latest.png")
