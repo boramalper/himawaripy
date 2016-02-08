@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 
 from io import BytesIO
-from itertools import product
 from json import loads
-from multiprocessing import Pool, cpu_count, Value
-from os import makedirs
-from os.path import split
 from time import strptime, strftime
+from subprocess import call
+from os import makedirs, environ
+from os.path import expanduser, split
 from urllib.request import urlopen
 
 from PIL import Image
+
+from utils import get_desktop_environment, has_program
+from multiprocessing import Pool, cpu_count, Value
+from itertools import product
 
 import datetime
 from time import mktime, strptime
@@ -17,9 +20,20 @@ import pytz
 from dateutil.relativedelta import *
 from tzlocal import get_localzone
 
-from .config import level, output_file, hour_offset, auto_offset
-from .utils import set_background, get_desktop_environment
+# Configuration
+# =============
 
+# Increases the quality and the size. Possible values: 4, 8, 16, 20
+level = 4
+
+#Define a ourly offset or let the script calculate it depending on your timezone
+auto_offset = False
+hour_offset = 0
+
+# Path to the output file
+output_file = expanduser("~/.himawari/himawari-latest.png")
+
+# ==============================================================================
 counter = None
 height = 550
 width = 550
@@ -35,6 +49,7 @@ def get_time_offset():
     offset = offset / 100
 
     return offset
+
 
 def download_chunk(args):
     global counter
@@ -67,9 +82,8 @@ def main():
             offset_tmp = offset_tmp - datetime.timedelta(hours=hour_offset)
             offset_time = offset_tmp.timetuple()
 
-
     print("Latest version: {} GMT\n".format(strftime("%Y/%m/%d %H:%M:%S", latest)))
-    if (auto_offset | hour_offset > 0):
+    if (auto_offset | hour_offset != 0):
         print("Offset version: {} GMT\n".format(strftime("%Y/%m/%d %H:%M:%S", offset_time)))
 
     png = Image.new('RGB', (width*level, height*level))
@@ -89,10 +103,34 @@ def main():
     makedirs(split(output_file)[0], exist_ok=True)
     png.save(output_file, "PNG")
 
-    if not set_background(output_file):
-        exit("\nYour desktop environment '{}' is not supported.".format(get_desktop_environment()))
+    de = get_desktop_environment()
+    if de in ["gnome", "unity", "cinnamon", "pantheon", "gnome-classic"]:
+        # Because of a bug and stupid design of gsettings, see http://askubuntu.com/a/418521/388226
+        if de == "unity":
+            call(["gsettings", "set", "org.gnome.desktop.background", "draw-background", "false"])
+        call(["gsettings", "set", "org.gnome.desktop.background", "picture-uri", "file://" + output_file])
+        call(["gsettings", "set", "org.gnome.desktop.background", "picture-options", "scaled"])
+        call(["gsettings", "set", "org.gnome.desktop.background", "primary-color", "FFFFFF"])
+    elif de == "mate":
+        call(["gsettings", "set", "org.mate.background", "picture-filename", output_file])
+    elif de == "xfce4":
+        call(["xfconf-query", "--channel", "xfce4-desktop", "--property", "/backdrop/screen0/monitor0/image-path", "--set", output_file])
+    elif de == "lxde":
+        call(["display", "-window", "root", output_file])
+    elif de == "mac":
+        call(["osascript", "-e", 'tell application "System Events"\nset theDesktops to a reference to every desktop\n'
+              'repeat with aDesktop in theDesktops\n'
+              'set the picture of aDesktop to \"' + output_file + '"\nend repeat\nend tell'])
+        call(["killall", "Dock"])
+    elif has_program("feh"):
+        print("\nCouldn't detect your desktop environment ('{}'), but you have"
+              "'feh' installed so we will use it.".format(de))
+        environ['DISPLAY'] = ':0'
+        call(["feh", "--bg-max", output_file])
+    else:
+        exit("Your desktop environment '{}' is not supported.".format(de))
 
-    print("\nDone!")
+    print("\nDone!\n")
 
 if __name__ == "__main__":
     main()

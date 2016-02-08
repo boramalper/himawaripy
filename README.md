@@ -14,10 +14,10 @@ near-realtime picture of Earth.
 * Unity 7
 * Mate 1.8.1
 * Pantheon
-* LXDE
 
 ### Not Tested
 * GNOME 3
+* LXDE
 * KDE
 * OS X
 
@@ -33,60 +33,27 @@ time to download the tiles.
 You can also change the path of the latest picture, which is by default
 `~/.himawari/himawari-latest.png`, by changing the `output_file` variable.
 
-### xfce4
-
-On xfce4, you can set which displays you want to change the background of using
-the xfce\_displays variable. If you get an error and you're not sure which
-display to use, you can find your display in the output of
-
-    xfconf-query --channel xfce4-desktop --list | grep last-image
-
-### Nitrogen
-If you use nitrogen for setting your wallpaper, you have to enter this in your
-`~/.config/nitrogen/bg-saved.cfg`.
-
-    [:0.0]
-    file=/home/USERNAME/.himawari/himawari-latest.png
-    mode=4
-    bgcolor=#000000
-
 ## Installation
+Make sure that you have [pillow](https://python-pillow.github.io/), dateutil, pytz, datetime, tzlocal installed:
+
+    pip3 install pillow python-dateutil pytz datetime tzlocal
+
+Then you can install himawaripy:
 
     cd ~
     git clone https://github.com/boramalper/himawaripy.git
 
     # configure
-    cd ~/himawaripy/
-    vi himawaripy/config.py
-
-    # install
-    sudo python3 setup.py install
+    cd ~/himawaripy
+    vi himawaripy.py
 
     # test whether it's working
-    himawaripy
+    ./himawaripy.py
 
-    # Get the installation path of himawaripy by running the command
-    which -- himawaripy
-
-    # Set himawaripy to be called periodically
-
-        ## Either set up a cronjob
-            crontab -e
-
-            ### Add the line:
-            */10 * * * * <INSTALLATION_PATH>
-
-        ## OR, alternatively use the provided systemd timer
-
-            ### Configure
-            vi systemd/himawaripy.service
-            # Replace "<INSTALLATION_PATH>" with the output of the aforementioned command.
-
-            ### Copy systemd configuration
-            cp systemd/himawaripy.{service,timer} $HOME/.config/systemd/user/
-
-            ### Enable and start the timer
-            systemctl --user enable --now himawaripy.timer
+    # set up a cronjob
+    crontab -e
+    # Add the line:
+    */10 * * * * /home/USERNAME/himawaripy/himawaripy.py
 
 ### For KDE Users
 > So the issue here is that KDE does not support changing the desktop wallpaper
@@ -105,22 +72,18 @@ If you use nitrogen for setting your wallpaper, you have to enter this in your
 Many thanks to [xenithorb](https://github.com/xenithorb) [for the solution](https://github.com/xenithorb/himawaripy/commit/01d7c681ae7ce47f639672733d0f734574662833)!
 
 ## Uninstallation
-    # Remove the cronjob
+    # remove the cronjob
     crontab -e
     # Remove the line
-    */10 * * * * <INSTALLATION_PATH>
-
-    # OR if you used the systemd timer
-    systemctl --user disable --now himawaripy.timer
-    rm $HOME/.config/systemd/user/himawaripy.{timer,service}
+    */10 * * * * /home/USERNAME/himawaripy/himawaripy.py
 
     # Remove the data directory
-    # By default, `~/.himawari`. Check `output_file` variable in config.py
+    # By default, `~/.himawari`. Check `output_file` variable in himawaripy.py
     # in case you've changed it.
     rm -rf ~/.himawari
 
-    # Uninstall the package
-    sudo pip3 uninstall himawaripy
+    # Remove the installation folder
+    rm -rf ~/himawaripy
 
 If you would like to share why, you can contact me on github or
 [send an e-mail](mailto:bora@boramalper.org).
