@@ -1,0 +1,8 @@
+# $HOME/.config/user/systemd/himawaripy.service
+
+[Unit]
+Description=Update desktop background with satellite imagery
+
+[Service]
+Type=oneshot
+ExecStart=<INSTALLATION_PATH>
