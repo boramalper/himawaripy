@@ -6,13 +6,12 @@ from json import loads
 from multiprocessing import Pool, cpu_count, Value
 from os import makedirs
 from os.path import split
-from time import strptime, strftime
+from time import strptime, strftime, mktime
 from urllib.request import urlopen
 
 from PIL import Image
 
-import datetime
-from time import mktime, strptime
+from datetime import datetime, timedelta
 import pytz
 from dateutil.relativedelta import *
 from tzlocal import get_localzone
@@ -26,16 +25,16 @@ width = 550
 
 def get_time_offset(latest_date):
     if (auto_offset):
-        local_date = datetime.datetime.now(pytz.timezone(str(get_localzone())))
-        himawari_date = datetime.datetime.now(pytz.timezone('Australia/Sydney'))
+        local_date = datetime.now(pytz.timezone(str(get_localzone())))
+        himawari_date = datetime.now(pytz.timezone('Australia/Sydney'))
         local_offset = local_date.strftime("%z")
         himawari_offset = himawari_date.strftime("%z")
 
         offset = int(local_offset) - int(himawari_offset);
         offset = offset / 100
 
-        offset_tmp = datetime.datetime.fromtimestamp(mktime(latest_date))
-        offset_tmp = offset_tmp + datetime.timedelta(hours=offset)
+        offset_tmp = datetime.fromtimestamp(mktime(latest_date))
+        offset_tmp = offset_tmp + timedelta(hours=offset)
         offset_time = offset_tmp.timetuple()
 
     elif (hour_offset > 0):
