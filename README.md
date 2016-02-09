@@ -54,11 +54,11 @@ If you use nitrogen for setting your wallpaper, you have to enter this in your
 
     cd ~
     git clone https://github.com/boramalper/himawaripy.git
-    
+
     # configure
     cd ~/himawaripy/
     vi himawaripy/config.py
-    
+
     # install
     sudo python3 setup.py install
 
@@ -69,25 +69,25 @@ If you use nitrogen for setting your wallpaper, you have to enter this in your
     which -- himawaripy
 
     # Set himawaripy to be called periodically
-    
+
         ## Either set up a cronjob
             crontab -e
-            
+
             ### Add the line:
             */10 * * * * <INSTALLATION_PATH>
-    
+
         ## OR, alternatively use the provided systemd timer
-        
+
             ### Configure
             vi systemd/himawaripy.service
             # Replace "<INSTALLATION_PATH>" with the output of the aforementioned command.
-            
+
             ### Copy systemd configuration
             cp systemd/himawaripy.{service,timer} $HOME/.config/systemd/user/
-            
+
             ### Enable and start the timer
             systemctl --user enable --now himawaripy.timer
-        
+
 ### For KDE Users
 > So the issue here is that KDE does not support changing the desktop wallpaper
 > from the commandline, but it does support polling a directory for file changes
@@ -127,7 +127,7 @@ If you would like to share why, you can contact me on github or
 
 ## Example
 ![Earth, as 2016/02/04/13:30:00 GMT](http://i.imgur.com/4XA6WaM.jpg)
-    
+
 ## Attributions
 Thanks to *[MichaelPote](https://github.com/MichaelPote)* for the [initial
 implementation](https://gist.github.com/MichaelPote/92fa6e65eacf26219022) using
