@@ -55,7 +55,7 @@ def download_chunk(args):
 
     with counter.get_lock():
         counter.value += 1
-        print("\rDownloading tiles: {}/{} completed".format(counter.value, level*level), end="", flush=True)
+        print("\rDownloading tiles: {}/{} completed".format(counter.value, level * level), end="", flush=True)
     return x, y, tiledata
 
 
@@ -80,16 +80,16 @@ def main():
 
     print()
 
-    png = Image.new('RGB', (width*level, height*level))
+    png = Image.new('RGB', (width * level, height * level))
 
     counter = Value("i", 0)
     p = Pool(cpu_count() * level)
-    print("Downloading tiles: 0/{} completed".format(level*level), end="", flush=True)
+    print("Downloading tiles: 0/{} completed".format(level * level), end="", flush=True)
     res = p.map(download_chunk, product(range(level), range(level), (requested_time,)))
 
     for (x, y, tiledata) in res:
         tile = Image.open(BytesIO(tiledata))
-        png.paste(tile, (width*x, height*y, width*(x+1), height*(y+1)))
+        png.paste(tile, (width * x, height * y, width * (x + 1), height * (y + 1)))
 
     makedirs(split(output_file)[0], exist_ok=True)
     png.save(output_file, "PNG")

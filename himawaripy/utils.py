@@ -54,12 +54,12 @@ def get_desktop_environment():
         return "windows"
     elif sys.platform == "darwin":
         return "mac"
-    else: # Most likely either a POSIX system or something not much common
+    else:  # Most likely either a POSIX system or something not much common
         desktop_session = os.environ.get("DESKTOP_SESSION")
-        if desktop_session is not None: # Easier to match if we don't have to deal with caracter cases
+        if desktop_session is not None:  # Easier to match if we don't have to deal with caracter cases
             desktop_session = desktop_session.lower()
             if desktop_session in ["gnome", "unity", "cinnamon", "mate", "xfce4", "lxde", "fluxbox",
-                                   "blackbox", "openbox", "icewm", "jwm", "afterstep","trinity", "kde", "pantheon",
+                                   "blackbox", "openbox", "icewm", "jwm", "afterstep", "trinity", "kde", "pantheon",
                                    "gnome-classic"]:
                 return desktop_session
             ## Special cases ##
@@ -73,9 +73,9 @@ def get_desktop_environment():
                 return "lxde"
             elif desktop_session.startswith("kubuntu"):
                 return "kde"
-            elif desktop_session.startswith("razor"): # e.g. razorkwin
+            elif desktop_session.startswith("razor"):  # e.g. razorkwin
                 return "razor-qt"
-            elif desktop_session.startswith("wmaker"): # e.g. wmaker-common
+            elif desktop_session.startswith("wmaker"):  # e.g. wmaker-common
                 return "windowmaker"
         if os.environ.get('KDE_FULL_SESSION') == 'true':
             return "kde"
@@ -114,7 +114,7 @@ def has_program(program):
 
 def is_running(process):
     try:
-        subprocess.check_output (["pidof", "--", process])
+        subprocess.check_output(["pidof", "--", process])
         return True
     except subprocess.CalledProcessError:
         return False
