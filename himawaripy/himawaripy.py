@@ -6,7 +6,7 @@ from itertools import product
 from json import loads
 from multiprocessing import Pool, cpu_count, Value
 from os import makedirs
-from os.path import split
+from os.path import dirname
 from time import strptime, strftime, mktime
 from urllib.request import urlopen
 
@@ -91,13 +91,14 @@ def main():
         tile = Image.open(BytesIO(tiledata))
         png.paste(tile, (width * x, height * y, width * (x + 1), height * (y + 1)))
 
-    makedirs(split(output_file)[0], exist_ok=True)
+    print("\nSaving to '%s'..." % (output_file))
+    makedirs(dirname(output_file), exist_ok=True)
     png.save(output_file, "PNG")
 
     if not set_background(output_file):
-        exit("\nYour desktop environment '{}' is not supported.".format(get_desktop_environment()))
+        exit("Your desktop environment '{}' is not supported.".format(get_desktop_environment()))
 
-    print("\nDone!")
+    print("Done!")
 
 if __name__ == "__main__":
     main()
