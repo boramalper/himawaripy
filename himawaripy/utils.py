@@ -2,10 +2,8 @@ import os
 import sys
 import subprocess
 
-from .config import xfce_displays
 
-
-def set_background(file_path):
+def set_background(file_path, xfce_displays):
     de = get_desktop_environment()
 
     if de in ["gnome", "unity", "cinnamon", "pantheon", "gnome-classic"]:

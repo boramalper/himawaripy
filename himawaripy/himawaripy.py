@@ -1,25 +1,28 @@
 #!/usr/bin/env python3
 
+""" Set near-realtime picture of Earth as your desktop background. """
+
+import argparse
 from datetime import datetime, timedelta
 from io import BytesIO
 from itertools import product
 from json import loads
+import math
 from multiprocessing import Pool, cpu_count, Value
-from os import makedirs
-from os.path import dirname
+import os
 from time import strptime, strftime, mktime
 from urllib.request import urlopen
 
+import appdirs
 from PIL import Image
 from pytz import timezone
 from tzlocal import get_localzone
 
-from .config import level, output_file, auto_offset, hour_offset
 from .utils import set_background, get_desktop_environment
 
+
+TILE_SIZE = 550
 counter = None
-height = 550
-width = 550
 
 
 def get_time_offset(latest_date):
@@ -47,24 +50,55 @@ def get_time_offset(latest_date):
 def download_chunk(args):
     global counter
 
-    x, y, latest = args
+    x, y, tile_count, latest = args
     url_format = "http://himawari8.nict.go.jp/img/D531106/{}d/{}/{}_{}_{}.png"
 
-    with urlopen(url_format.format(level, width, strftime("%Y/%m/%d/%H%M%S", latest), x, y)) as tile_w:
+    with urlopen(url_format.format(tile_count, TILE_SIZE, strftime("%Y/%m/%d/%H%M%S", latest), x, y)) as tile_w:
         tiledata = tile_w.read()
 
     with counter.get_lock():
         counter.value += 1
-        print("\rDownloading tiles: {}/{} completed".format(counter.value, level * level), end="", flush=True)
+        print("\rDownloading tiles: {}/{} completed".format(counter.value, tile_count * tile_count), end="", flush=True)
     return x, y, tiledata
 
 
 def main():
     global counter
 
-    if auto_offset and hour_offset:
-        exit("You can not set `auto_offset` to True and `hour_offset` to a value that is different than zero.")
-    elif hour_offset < 0:
+    # parse args
+    arg_parser = argparse.ArgumentParser(description=__doc__,
+                                         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    arg_parser.add_argument("--width",
+                            type=int,
+                            default=1920,
+                            dest="width",
+                            help="Output image width in pixels")
+    arg_parser.add_argument("--height",
+                            type=int,
+                            default=1200,
+                            dest="height",
+                            help="Output image height in pixels")
+    arg_parser.add_argument("--hour-offset",
+                            type=int,
+                            default=None,
+                            dest="hour_offset",
+                            help="Define a hourly offset. Default calculates it automatically from your timezone.")
+    arg_parser.add_argument("--xfce-displays",
+                            default=("/backdrop/screen0/monitor0/image-path",
+                                     "/backdrop/screen0/monitor0/workspace0/last-image"),
+                            nargs="+",
+                            dest="xfce_displays",
+                            help="XFCE4 displays to change the background of")
+    arg_parser.add_argument("-o",
+                            "--output-file",
+                            default=os.path.join(appdirs.user_cache_dir(appname="himawaripy",
+                                                                        appauthor=False),
+                                                 "latest.png"),
+                            dest="output_file",
+                            help="Image output file path")
+    args = arg_parser.parse_args()
+
+    if (args.hour_offset is not None) and (args.hour_offset < 0):
         exit("`hour_offset` must be greater than or equal to zero. I can't get future images of Earth for now.")
 
     print("Updating...")
@@ -72,7 +106,7 @@ def main():
         latest = strptime(loads(latest_json.read().decode("utf-8"))["date"], "%Y-%m-%d %H:%M:%S")
 
     print("Latest version: {} GMT".format(strftime("%Y/%m/%d %H:%M:%S", latest)))
-    if auto_offset or hour_offset > 0:
+    if args.hour_offset is not None:
         requested_time = get_time_offset(latest)
         print("Offset version: {} GMT".format(strftime("%Y/%m/%d %H:%M:%S", requested_time)))
     else:
@@ -80,22 +114,32 @@ def main():
 
     print()
 
-    png = Image.new('RGB', (width * level, height * level))
+    tile_count = math.ceil(max(args.width, args.height) / TILE_SIZE)
+    for v in (4, 8, 16, 20):
+        if tile_count <= v:
+            tile_count = v
+            break
+    else:
+        tile_count = 20
+    png = Image.new('RGB', (TILE_SIZE * tile_count, TILE_SIZE * tile_count))
 
     counter = Value("i", 0)
-    p = Pool(cpu_count() * level)
-    print("Downloading tiles: 0/{} completed".format(level * level), end="", flush=True)
-    res = p.map(download_chunk, product(range(level), range(level), (requested_time,)))
+    p = Pool(cpu_count() * tile_count)
+    print("Downloading tiles: 0/{} completed".format(tile_count * tile_count), end="", flush=True)
+    res = p.map(download_chunk, product(range(tile_count), range(tile_count), (tile_count,), (requested_time,)))
 
     for (x, y, tiledata) in res:
         tile = Image.open(BytesIO(tiledata))
-        png.paste(tile, (width * x, height * y, width * (x + 1), height * (y + 1)))
+        png.paste(tile, (TILE_SIZE * x, TILE_SIZE * y, TILE_SIZE * (x + 1), TILE_SIZE * (y + 1)))
 
-    print("\nSaving to '%s'..." % (output_file))
-    makedirs(dirname(output_file), exist_ok=True)
-    png.save(output_file, "PNG")
+    print("\nSaving as %ux%u to '%s'..." % (args.width, args.height, args.output_file))
+    output_dir = os.path.dirname(args.output_file)
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
+    png = png.resize((args.width, args.height), Image.LANCZOS)
+    png.save(args.output_file, "PNG")
 
-    if not set_background(output_file):
+    if not set_background(args.output_file, xfce_displays=args.xfce_displays):
         exit("Your desktop environment '{}' is not supported.".format(get_desktop_environment()))
 
     print("Done!")
