@@ -124,7 +124,7 @@ def main():
     png = Image.new('RGB', (TILE_SIZE * tile_count, TILE_SIZE * tile_count))
 
     counter = Value("i", 0)
-    p = Pool(cpu_count() * tile_count)
+    p = Pool(min(16, cpu_count() * tile_count))
     print("Downloading tiles: 0/{} completed".format(tile_count * tile_count), end="", flush=True)
     res = p.map(download_chunk, product(range(tile_count), range(tile_count), (tile_count,), (requested_time,)))
 
