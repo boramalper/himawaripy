@@ -25,8 +25,8 @@ TILE_SIZE = 550
 counter = None
 
 
-def get_time_offset(latest_date):
-    if auto_offset:
+def get_time_offset(latest_date, hour_offset):
+    if hour_offset is None:
         local_date = datetime.now(timezone(str(get_localzone())))
         himawari_date = datetime.now(timezone('Australia/Sydney'))
         local_offset = local_date.strftime("%z")
@@ -39,7 +39,7 @@ def get_time_offset(latest_date):
         offset_tmp = offset_tmp + timedelta(hours=offset)
         offset_time = offset_tmp.timetuple()
 
-    elif hour_offset > 0:
+    else:
         offset_tmp = datetime.fromtimestamp(mktime(latest_date))
         offset_tmp = offset_tmp - timedelta(hours=hour_offset)
         offset_time = offset_tmp.timetuple()
@@ -106,8 +106,8 @@ def main():
         latest = strptime(loads(latest_json.read().decode("utf-8"))["date"], "%Y-%m-%d %H:%M:%S")
 
     print("Latest version: {} GMT".format(strftime("%Y/%m/%d %H:%M:%S", latest)))
-    if args.hour_offset is not None:
-        requested_time = get_time_offset(latest)
+    if args.hour_offset != 0:
+        requested_time = get_time_offset(latest, args.hour_offset)
         print("Offset version: {} GMT".format(strftime("%Y/%m/%d %H:%M:%S", requested_time)))
     else:
         requested_time = latest
