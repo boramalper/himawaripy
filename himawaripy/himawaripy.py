@@ -2,6 +2,8 @@
 
 """ Set near-realtime picture of Earth as your desktop background. """
 
+__version__ = "1.2.0"
+
 import argparse
 from datetime import datetime, timedelta
 from io import BytesIO
