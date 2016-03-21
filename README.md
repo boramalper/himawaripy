@@ -1,4 +1,5 @@
 # himawaripy
+
 *Put near-realtime picture of Earth as your desktop background*
 
 himawaripy is a Python 3 script that fetches near-realtime (10 minutes delayed)
@@ -10,28 +11,27 @@ Set a cronjob that runs in every 10 minutes to automatically get the
 near-realtime picture of Earth.
 
 ## Supported Desktop Environments
+
 ### Tested
+
 * Unity 7
 * Mate 1.8.1
 * Pantheon
 * LXDE
 
 ### Not Tested
+
 * GNOME 3
 * KDE
 * OS X
 
 ### Not Supported
+
 * any other desktop environments that are not mentioned above.
 
-## Configuration
-You can configure the level of detail, by modifying the script. You can set the
-global variable `level` to `4`, `8`, `16`, or `20` to increase the quality (and
-thus the file size as well). Please keep in mind that it will also take more
-time to download the tiles.
+## Usage
 
-You can also change the path of the latest picture, which is by default
-`~/.himawari/himawari-latest.png`, by changing the `output_file` variable.
+See `himawari -h` for command line parameters description.
 
 ### xfce4
 
@@ -42,6 +42,7 @@ display to use, you can find your display in the output of
     xfconf-query --channel xfce4-desktop --list | grep last-image
 
 ### Nitrogen
+
 If you use nitrogen for setting your wallpaper, you have to enter this in your
 `~/.config/nitrogen/bg-saved.cfg`.
 
@@ -52,18 +53,8 @@ If you use nitrogen for setting your wallpaper, you have to enter this in your
 
 ## Installation
 
-    cd ~
-    git clone https://github.com/boramalper/himawaripy.git
-
-    # configure
-    cd ~/himawaripy/
-    vi himawaripy/config.py
-
-    # install
-    sudo python3 setup.py install
-
-    # test whether it's working
-    himawaripy
+    # install from pip
+    pip3 install himawaripy
 
     # Get the installation path of himawaripy by running the command
     which -- himawaripy
@@ -89,6 +80,7 @@ If you use nitrogen for setting your wallpaper, you have to enter this in your
             systemctl --user enable --now himawaripy.timer
 
 ### For KDE Users
+
 > So the issue here is that KDE does not support changing the desktop wallpaper
 > from the commandline, but it does support polling a directory for file changes
 > through the "Slideshow" desktop background option, whereby you can point KDE
@@ -98,13 +90,14 @@ If you use nitrogen for setting your wallpaper, you have to enter this in your
 >
 > * Set the cron for some interval (say 9 minutes)
 > * Open Desktop Settings -> Wallpaper -> Wallpaper Type -> Slideshow
-> * Add the `~/.himawari` dir to the slideshow list
+> * Add the `~/.cache/himawaripy` dir to the slideshow list
 > * Set the interval check to 10 minutes (one minute after the cron, also
 >   depending on your download speed)
 
 Many thanks to [xenithorb](https://github.com/xenithorb) [for the solution](https://github.com/xenithorb/himawaripy/commit/01d7c681ae7ce47f639672733d0f734574662833)!
 
 ## Uninstallation
+
     # Remove the cronjob
     crontab -e
     # Remove the line
@@ -115,20 +108,21 @@ Many thanks to [xenithorb](https://github.com/xenithorb) [for the solution](http
     rm $HOME/.config/systemd/user/himawaripy.{timer,service}
 
     # Remove the data directory
-    # By default, `~/.himawari`. Check `output_file` variable in config.py
-    # in case you've changed it.
-    rm -rf ~/.himawari
+    # By default, `~/.cache/himawaripy`.
+    rm -rf ~/.cache/himawaripy
 
     # Uninstall the package
-    sudo pip3 uninstall himawaripy
+    pip3 uninstall himawaripy
 
 If you would like to share why, you can contact me on github or
 [send an e-mail](mailto:bora@boramalper.org).
 
 ## Example
+
 ![Earth, as 2016/02/04/13:30:00 GMT](http://i.imgur.com/4XA6WaM.jpg)
 
 ## Attributions
+
 Thanks to *[MichaelPote](https://github.com/MichaelPote)* for the [initial
 implementation](https://gist.github.com/MichaelPote/92fa6e65eacf26219022) using
 Powershell Script.
