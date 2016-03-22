@@ -70,16 +70,11 @@ def main():
     # parse args
     arg_parser = argparse.ArgumentParser(description=__doc__,
                                          formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    arg_parser.add_argument("--width",
-                            type=int,
-                            default=1920,
-                            dest="width",
-                            help="Output image width in pixels")
-    arg_parser.add_argument("--height",
+    arg_parser.add_argument("--size",
                             type=int,
                             default=1200,
-                            dest="height",
-                            help="Output image height in pixels")
+                            dest="size",
+                            help="Output image size in pixels (image is square)")
     arg_parser.add_argument("--hour-offset",
                             type=int,
                             default=None,
@@ -116,7 +111,7 @@ def main():
 
     print()
 
-    tile_count = math.ceil(max(args.width, args.height) / TILE_SIZE)
+    tile_count = math.ceil(args.size / TILE_SIZE)
     for v in (4, 8, 16, 20):
         if tile_count <= v:
             tile_count = v
@@ -134,11 +129,11 @@ def main():
         tile = Image.open(BytesIO(tiledata))
         png.paste(tile, (TILE_SIZE * x, TILE_SIZE * y, TILE_SIZE * (x + 1), TILE_SIZE * (y + 1)))
 
-    print("\nSaving as %ux%u to '%s'..." % (args.width, args.height, args.output_file))
+    print("\nSaving as %ux%u to '%s'..." % (args.size, args.size, args.output_file))
     output_dir = os.path.dirname(args.output_file)
     if output_dir:
         os.makedirs(output_dir, exist_ok=True)
-    png = png.resize((args.width, args.height), Image.LANCZOS)
+    png = png.resize((args.size, args.size), Image.LANCZOS)
     png.save(args.output_file, "PNG")
 
     if not set_background(args.output_file, xfce_displays=args.xfce_displays):
