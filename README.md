@@ -1,9 +1,4 @@
 # himawaripy
-
-#Difference from boramalper/himawaripy?
-
-I've added in support for the i3 desktop environment using feh now weirdo power users like me can also get beautiful south pacific imagery on their desktops
-
 *Put near-realtime picture of Earth as your desktop background*
 
 himawaripy is a Python 3 script that fetches near-realtime (10 minutes delayed)
