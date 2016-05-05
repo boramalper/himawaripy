@@ -1,0 +1,5 @@
+appdirs
+pillow>=2.7.0
+python-dateutil
+pytz
+tzlocal
