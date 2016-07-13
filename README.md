@@ -15,11 +15,11 @@ near-realtime picture of Earth.
 * Mate 1.8.1
 * Pantheon
 * LXDE
+* OS X
 
 ### Not Tested
 * GNOME 3
 * KDE
-* OS X
 
 ### Not Supported
 * any other desktop environments that are not mentioned above.
@@ -103,6 +103,23 @@ If you use nitrogen for setting your wallpaper, you have to enter this in your
 >   depending on your download speed)
 
 Many thanks to [xenithorb](https://github.com/xenithorb) [for the solution](https://github.com/xenithorb/himawaripy/commit/01d7c681ae7ce47f639672733d0f734574662833)!
+
+
+### For Mac OSX Users
+
+OSX has deprecated crontab, and replaced it with `launchd`. To set up a launch agent, copy the provied sample `plist` file in `osx/com.user.himawaripy.plist` to `~/Library/LaunchAgents`, and edit the following entries if required
+
+    mkdir -p ~/Library/LaunchAgents/
+    cp osx/com.user.himawaripy.plist ~/Library/LaunchAgents/
+
+* `ProgrammingArguments` needs to be the `/path/to/himawaripy/installation`. This *should* be `/usr/local/bin/himawaripy` by default, but himawaripy may be installed elsewhere.
+
+* `StartInterval` controls the interval between successive runs, set to 10 minutes (600 seconds) by default, edit as desired.
+
+Finally, to launch it, enter this into the console:
+
+    launchctl load ~/Library/LaunchAgents/com.user.himawaripy.plist
+
 
 ## Uninstallation
     # Remove the cronjob
