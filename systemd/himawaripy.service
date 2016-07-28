@@ -1,4 +1,4 @@
-# $HOME/.config/user/systemd/himawaripy.service
+# $HOME/.config/systemd/user/himawaripy.service
 
 [Unit]
 Description=Update desktop background with satellite imagery
