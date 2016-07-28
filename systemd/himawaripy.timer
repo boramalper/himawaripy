@@ -1,4 +1,4 @@
-# $HOME/.config/user/systemd/himawaripy.timer
+# $HOME/.config/systemd/user/himawaripy.timer
 
 [Unit]
 Description=Run himawaripy every 10 minutes
