@@ -14,7 +14,7 @@ from PIL import Image
 from pytz import timezone
 from tzlocal import get_localzone
 
-from .config import level, output_file, auto_offset, hour_offset
+from .config import level, output_file, auto_offset, hour_offset, output_info_file
 from .utils import set_background, get_desktop_environment
 
 counter = None
@@ -77,6 +77,16 @@ def main():
         print("Offset version: {} GMT".format(strftime("%Y/%m/%d %H:%M:%S", requested_time)))
     else:
         requested_time = latest
+
+    with open(output_info_file, 'r') as myfile:
+        data=myfile.read().replace('\n', '') 
+
+    if data == str(latest):
+        exit("No update!")
+
+    file_ = open(output_info_file, 'w')
+    file_.write(str(latest))
+    file_.close()
 
     print()
 
