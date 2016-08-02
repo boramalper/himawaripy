@@ -16,9 +16,10 @@ near-realtime picture of Earth.
 * Pantheon
 * LXDE
 * OS X
+* GNOME 3
 
 ### Not Tested
-* GNOME 3
+
 * KDE
 
 ### Not Supported
