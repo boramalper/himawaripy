@@ -16,10 +16,10 @@ near-realtime picture of Earth.
 * Pantheon
 * LXDE
 * OS X
+* KDE
 
 ### Not Tested
 * GNOME 3
-* KDE
 
 ### Not Supported
 * any other desktop environments that are not mentioned above.
@@ -89,6 +89,13 @@ If you use nitrogen for setting your wallpaper, you have to enter this in your
             systemctl --user enable --now himawaripy.timer
 
 ### For KDE Users
+#### KDE 5.7+
+To change the wallpaper in KDE 5.7+, desktop widgets must be unlocked. If you dom't want to leave them unlocked, the pre-KDE 5.7 method can still be used.
+
+To unlock desktop widgets ([from the KDE userbase](https://userbase.kde.org/Plasma#Widgets)):
+> Open the Desktop Toolbox or the Panel Toolbox or right click on the Desktop - if you see an item labeled Unlock Widgets then select that, and then proceed to add widgets to your Desktop or your Panel. 
+
+#### Before KDE 5.7
 > So the issue here is that KDE does not support changing the desktop wallpaper
 > from the commandline, but it does support polling a directory for file changes
 > through the "Slideshow" desktop background option, whereby you can point KDE
