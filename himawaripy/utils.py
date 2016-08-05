@@ -1,6 +1,8 @@
 import os
+import re
 import sys
 import subprocess
+from distutils.version import LooseVersion
 
 from .config import xfce_displays
 
@@ -30,6 +32,32 @@ def set_background(file_path):
                          'repeat with aDesktop in theDesktops\n'
                          'set the picture of aDesktop to \"' + file_path + '"\nend repeat\nend tell'])
         subprocess.call(["killall", "Dock"])
+    elif de == "kde":
+        if plasma_version() > LooseVersion("5.7"):
+            ''' Command per https://github.com/boramalper/himawaripy/issues/57
+
+                Sets 'FillMode' to 1, which is "Scaled, Keep Proportions"
+                Forces 'Color' to black, which sets the background colour.
+            '''
+            script = 'var a = desktops();' \
+                     'for (i = 0; i < a.length; i++) {{' \
+                     'd = a[i];d.wallpaperPlugin = "org.kde.image";' \
+                     'd.currentConfigGroup = Array("Wallpaper", "org.kde.image", "General");' \
+                     'd.writeConfig("Image", "file://{}");' \
+                     'd.writeConfig("FillMode", 1);' \
+                     'd.writeConfig("Color", "#000");' \
+                     '}}'
+            try:
+                subprocess.check_output(["qdbus", "org.kde.plasmashell", "/PlasmaShell",
+                                         "org.kde.PlasmaShell.evaluateScript", script.format(file_path)])
+            except subprocess.CalledProcessError as e:
+                if "Widgets are locked" in e.output.decode("utf-8"):
+                    print("!! Cannot change the wallpaper while widgets are locked.")
+                    print("!! Please unlock widgets to allow wallpaper changing.\n")
+                else:
+                    print(e)
+        else:
+            print("\nCouldn't detect plasmashell 5.7 or higher.")
     elif has_program("feh"):
         print("\nCouldn't detect your desktop environment ('{}'), but you have"
               "'feh' installed so we will use it.".format(de))
@@ -112,6 +140,16 @@ def has_program(program):
         return True
     except subprocess.CalledProcessError:
         return False
+
+
+def plasma_version():
+    try:
+        output = subprocess.Popen(["plasmashell", "-v"], stdout=subprocess.PIPE).communicate()[0].decode("utf-8")
+        print("\nRunning", output)
+        version = re.match(r"plasmashell (.*)", output).group(1)
+        return LooseVersion(version)
+    except (subprocess.CalledProcessError, IndexError):
+        return LooseVersion("")
 
 
 def is_running(process):
