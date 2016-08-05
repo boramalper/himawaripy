@@ -16,7 +16,7 @@ def set_background(file_path):
             subprocess.call(["gsettings", "set", "org.gnome.desktop.background", "draw-background", "false"])
         subprocess.call(["gsettings", "set", "org.gnome.desktop.background", "picture-uri", "file://" + file_path])
         subprocess.call(["gsettings", "set", "org.gnome.desktop.background", "picture-options", "scaled"])
-        subprocess.call(["gsettings", "set", "org.gnome.desktop.background", "primary-color", "#FFFFFF"])
+        subprocess.call(["gsettings", "set", "org.gnome.desktop.background", "primary-color", "#000000"])
     elif de == "mate":
         subprocess.call(["gsettings", "set", "org.mate.background", "picture-filename", file_path])
     elif de == 'i3':
