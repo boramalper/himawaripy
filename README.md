@@ -17,6 +17,7 @@ near-realtime picture of Earth.
 * LXDE
 * OS X
 * GNOME 3
+* Cinnamon 2.8.8
 
 ### Not Tested
 
