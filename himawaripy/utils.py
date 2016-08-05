@@ -20,7 +20,7 @@ def set_background(file_path):
     elif de == "mate":
         subprocess.call(["gsettings", "set", "org.mate.background", "picture-filename", file_path])
     elif de == 'i3':
-        subprocess.call(['feh','--bg-fill',file_path])
+        subprocess.call(['feh','--bg-max',file_path])
     elif de == "xfce4":
         for display in xfce_displays:
             subprocess.call(["xfconf-query", "--channel", "xfce4-desktop", "--property", display, "--set", file_path])
