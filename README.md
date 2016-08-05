@@ -108,7 +108,7 @@ Many thanks to [xenithorb](https://github.com/xenithorb) [for the solution](http
 
 ### For Mac OSX Users
 
-OSX has deprecated crontab, and replaced it with `launchd`. To set up a launch agent, copy the provied sample `plist` file in `osx/com.user.himawaripy.plist` to `~/Library/LaunchAgents`, and edit the following entries if required
+OSX has deprecated crontab, and replaced it with `launchd`. To set up a launch agent, copy the provided sample `plist` file in `osx/com.user.himawaripy.plist` to `~/Library/LaunchAgents`, and edit the following entries if required
 
     mkdir -p ~/Library/LaunchAgents/
     cp osx/com.user.himawaripy.plist ~/Library/LaunchAgents/
