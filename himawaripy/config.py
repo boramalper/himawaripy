@@ -18,6 +18,9 @@ output_file = os.path.join(appdirs.user_cache_dir(appname="himawaripy",
                                                   appauthor=False),
                            "latest.png")
 
+# Deadline for the whole download process in minutes
+dl_deadline = 6
+
 # Xfce4 displays to change the background of
 xfce_displays = ["/backdrop/screen0/monitor0/image-path",
                  "/backdrop/screen0/monitor0/workspace0/last-image"]

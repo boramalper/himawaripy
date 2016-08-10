@@ -14,12 +14,13 @@ from PIL import Image
 from pytz import timezone
 from tzlocal import get_localzone
 
-from .config import level, output_file, auto_offset, hour_offset
+from .config import level, output_file, auto_offset, hour_offset , dl_deadline
 from .utils import set_background, get_desktop_environment
 
 counter = None
 height = 550
 width = 550
+dl_timeout = dl_deadline * 60 / (level ** 2)
 
 
 def get_time_offset(latest_date):
@@ -49,9 +50,13 @@ def download_chunk(args):
 
     x, y, latest = args
     url_format = "http://himawari8.nict.go.jp/img/D531106/{}d/{}/{}_{}_{}.png"
+    url = url_format.format(level, width, strftime("%Y/%m/%d/%H%M%S", latest), x, y)
 
-    with urlopen(url_format.format(level, width, strftime("%Y/%m/%d/%H%M%S", latest), x, y)) as tile_w:
-        tiledata = tile_w.read()
+    try:
+        with urlopen(url , timeout = dl_timeout) as tile_w:
+            tiledata = tile_w.read()
+    except:
+        raise OSError("\n\nTimeout when downloading tiles.")
 
     with counter.get_lock():
         counter.value += 1
@@ -85,7 +90,11 @@ def main():
     counter = Value("i", 0)
     p = Pool(cpu_count() * level)
     print("Downloading tiles: 0/{} completed".format(level * level), end="", flush=True)
-    res = p.map(download_chunk, product(range(level), range(level), (requested_time,)))
+    try:
+        res = p.map(download_chunk, product(range(level), range(level), (requested_time,)))
+    except OSError as oe:
+        p.terminate()
+        exit(oe)
 
     for (x, y, tiledata) in res:
         tile = Image.open(BytesIO(tiledata))
