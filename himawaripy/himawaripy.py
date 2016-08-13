@@ -17,6 +17,8 @@ from tzlocal import get_localzone
 from .utils import set_background, get_desktop_environment
 from .config import level, output_file, auto_offset, hour_offset, margin_offset, max_retry_count
 
+from pkg_resources import resource_string
+
 counter = None
 height = 550
 width = 550
@@ -91,7 +93,8 @@ def check_chunk_by_time(requested_time, delta=10, max_retry=max_retry_count):
     return latest time with normal image
     '''
 
-    pattern = Image.open(r'himawaripy/src/no-image.png')
+    pattern = Image.open(BytesIO(
+        resource_string('himawaripy.src', 'no-image.png')))
     print('Image check ...')
     for i in range(max_retry):
         tile = Image.open(BytesIO(
