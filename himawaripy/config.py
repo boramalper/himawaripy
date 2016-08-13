@@ -14,9 +14,17 @@ auto_offset = True
 hour_offset = 0
 
 # Path to the output file
-output_file = os.path.join(appdirs.user_cache_dir(appname="himawaripy",
-                                                  appauthor=False),
-                           "latest.png")
+output_file = os.path.join(appdirs.user_cache_dir(
+    appname="himawaripy", appauthor=False), "latest.png")
+# output_file = "/home/detavern/latest.png"
+
+# margin offset(left upper right lower)
+margin_offset = (0, 0, 0, 0)
+
+# Check first tile of image if it's available
+# If not("No Image"), it will try to get image 10 minutes earlier
+# each retry will get image 10 minutes more eariler
+max_retry_count = 3
 
 # Xfce4 displays to change the background of
 xfce_displays = ["/backdrop/screen0/monitor0/image-path",

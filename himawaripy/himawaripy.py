@@ -10,12 +10,14 @@ from os.path import dirname
 from time import strptime, strftime, mktime
 from urllib.request import urlopen
 
-from PIL import Image
+from PIL import Image, ImageChops
 from pytz import timezone
 from tzlocal import get_localzone
 
-from .config import level, output_file, auto_offset, hour_offset
 from .utils import set_background, get_desktop_environment
+from .config import level, output_file, auto_offset, hour_offset, margin_offset, max_retry_count
+
+from pkg_resources import resource_string
 
 counter = None
 height = 550
@@ -59,6 +61,61 @@ def download_chunk(args):
     return x, y, tiledata
 
 
+def download_chunk_once(args):
+    x, y, latest = args
+    url_format = "http://himawari8.nict.go.jp/img/D531106/{}d/{}/{}_{}_{}.png"
+
+    with urlopen(url_format.format(level, width, strftime(
+                 "%Y/%m/%d/%H%M%S", latest), x, y)) as tile_w:
+        tiledata = tile_w.read()
+    print("Downloading one tile completed")
+    return x, y, tiledata
+
+
+def add_margin(png):
+    back_png = Image.new('RGB', (
+        png.width + margin_offset[0] + margin_offset[2],
+        png.height + margin_offset[1] + margin_offset[3]
+    ))
+    box = (margin_offset[0], margin_offset[1],
+           margin_offset[0] + png.width, margin_offset[1] + png.height)
+    back_png.paste(png, box)
+    return back_png
+
+
+def equal_image(im1, im2):
+    return ImageChops.difference(im1, im2).getbbox() is None
+
+
+def check_chunk_by_time(requested_time, delta=10, max_retry=max_retry_count):
+    '''
+    check first chunk of default level by certain time
+    return latest time with normal image
+    '''
+
+    pattern = Image.open(BytesIO(
+        resource_string('himawaripy.src', 'no-image.png')))
+    print('Image check ...')
+    for i in range(max_retry):
+        tile = Image.open(BytesIO(
+            download_chunk_once((0, 0, requested_time))[-1]))
+        if equal_image(pattern, tile) is False:
+            print('Version: {} GMT available\n'.format(
+                strftime("%Y/%m/%d %H:%M:%S", requested_time)))
+            break
+        print('No image at version: {} GMT'.format(
+            strftime("%Y/%m/%d %H:%M:%S", requested_time)))
+        requested_tmp = datetime.fromtimestamp(mktime(requested_time))
+        requested_tmp = requested_tmp - timedelta(minutes=delta)
+        requested_time = requested_tmp.timetuple()
+        print('Try earlier version: {} GMT (delta:{}, count:{})\n'.format(
+            strftime("%Y/%m/%d %H:%M:%S", requested_time), delta, i + 1))
+    else:
+        print('Retry times reached maximum!')
+        exit()
+    return requested_time
+
+
 def main():
     global counter
 
@@ -83,6 +140,7 @@ def main():
     png = Image.new('RGB', (width * level, height * level))
 
     counter = Value("i", 0)
+    requested_time = check_chunk_by_time(requested_time)
     p = Pool(cpu_count() * level)
     print("Downloading tiles: 0/{} completed".format(level * level), end="", flush=True)
     res = p.map(download_chunk, product(range(level), range(level), (requested_time,)))
@@ -91,7 +149,10 @@ def main():
         tile = Image.open(BytesIO(tiledata))
         png.paste(tile, (width * x, height * y, width * (x + 1), height * (y + 1)))
 
-    print("\nSaving to '%s'..." % (output_file))
+    print("\nAdd margin (left:{} upper:{} right:{} lower:{})".format(*margin_offset))
+    png = add_margin(png)
+
+    print("Saving to '%s'..." % (output_file))
     makedirs(dirname(output_file), exist_ok=True)
     png.save(output_file, "PNG")
 
