@@ -2,6 +2,8 @@ import os.path
 
 import appdirs
 
+import subprocess
+
 # Increases the quality and the size. Possible values: 4, 8, 16, 20
 level = 4
 
@@ -19,5 +21,6 @@ output_file = os.path.join(appdirs.user_cache_dir(appname="himawaripy",
                            "latest.png")
 
 # Xfce4 displays to change the background of
-xfce_displays = ["/backdrop/screen0/monitor0/image-path",
-                 "/backdrop/screen0/monitor0/workspace0/last-image"]
+xfce_displays = subprocess.getoutput(
+        'xfconf-query --channel xfce4-desktop --list | grep last-image').split()
+
