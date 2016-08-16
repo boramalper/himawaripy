@@ -1,5 +1,3 @@
-import os.path
-
 import appdirs
 
 # Increases the quality and the size. Possible values: 4, 8, 16, 20
@@ -13,10 +11,8 @@ level = 4
 auto_offset = True
 hour_offset = 0
 
-# Path to the output file
-output_file = os.path.join(appdirs.user_cache_dir(appname="himawaripy",
-                                                  appauthor=False),
-                           "latest.png")
+# Path to the output directory
+output_dir = appdirs.user_cache_dir(appname="himawaripy", appauthor=False)
 
 # Deadline for the whole download process in minutes
 dl_deadline = 6

@@ -5,17 +5,18 @@ from io import BytesIO
 from itertools import product
 from json import loads
 from multiprocessing import Pool, cpu_count, Value
-from os import makedirs
-from os.path import dirname
+from os import makedirs, remove
+from os.path import dirname, join
 from time import strptime, strftime, mktime
 from urllib.request import urlopen
 from socket import timeout as TimeoutException
+from glob import iglob
 
 from PIL import Image
 from pytz import timezone
 from dateutil.tz import tzlocal
 
-from .config import level, output_file, auto_offset, hour_offset , dl_deadline
+from .config import level, output_dir, auto_offset, hour_offset , dl_deadline
 from .utils import set_background, get_desktop_environment
 
 counter = None
@@ -101,6 +102,10 @@ def main():
         tile = Image.open(BytesIO(tiledata))
         png.paste(tile, (width * x, height * y, width * (x + 1), height * (y + 1)))
 
+    for file in iglob(join(output_dir, "himawari-*.png")):
+        remove(file)
+
+    output_file = join(output_dir, strftime("himawari-%Y%m%dT%H%M%S.png", requested_time))
     print("\nSaving to '%s'..." % (output_file))
     makedirs(dirname(output_file), exist_ok=True)
     png.save(output_file, "PNG")
