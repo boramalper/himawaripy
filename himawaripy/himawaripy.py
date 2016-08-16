@@ -85,13 +85,17 @@ def main():
 
     png = Image.new('RGB', (width * level, height * level))
 
-    counter = Value("i", 0)
-    p = Pool(cpu_count() * level)
-    print("Downloading tiles: 0/{} completed".format(level * level), end="", flush=True)
     try:
-        res = p.map(download_chunk, product(range(level), range(level), (requested_time,)))
-    except TimeoutException:
-        exit("\nTimeout while downloading tiles.")
+        counter = Value("i", 0)
+        p = Pool(cpu_count() * level)
+        print("Downloading tiles: 0/{} completed".format(level * level), end="", flush=True)
+        try:
+            res = p.map(download_chunk, product(range(level), range(level), (requested_time,)))
+        except TimeoutException:
+            exit("\nTimeout while downloading tiles.")
+    finally:  # Make sure that we terminate proccess pool, whatever happens...
+        p.terminate()
+        p.join()
 
     for (x, y, tiledata) in res:
         tile = Image.open(BytesIO(tiledata))
