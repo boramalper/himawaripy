@@ -15,8 +15,8 @@ from PIL import Image
 from pytz import timezone
 from dateutil.tz import tzlocal
 
-from config import level, output_file, auto_offset, hour_offset , dl_deadline
-from utils import set_background, get_desktop_environment
+from .config import level, output_file, auto_offset, hour_offset , dl_deadline
+from .utils import set_background, get_desktop_environment
 
 counter = None
 height = 550
