@@ -4,8 +4,6 @@ import sys
 import subprocess
 from distutils.version import LooseVersion
 
-from .config import xfce_displays
-
 
 def set_background(file_path):
     de = get_desktop_environment()
@@ -22,7 +20,10 @@ def set_background(file_path):
     elif de == 'i3':
         subprocess.call(['feh','--bg-max',file_path])
     elif de == "xfce4":
-        for display in xfce_displays:
+        # Xfce4 displays to change the background of
+        displays = subprocess.getoutput('xfconf-query --channel xfce4-desktop --list | grep last-image').split()
+
+        for display in displays:
             subprocess.call(["xfconf-query", "--channel", "xfce4-desktop", "--property", display, "--set", file_path])
     elif de == "lxde":
         subprocess.call(["pcmanfm", "--set-wallpaper", file_path, "--wallpaper-mode=fit", ])
