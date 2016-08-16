@@ -12,7 +12,7 @@ from urllib.request import urlopen
 
 from PIL import Image
 from pytz import timezone
-from tzlocal import get_localzone
+from dateutil.tz import tzlocal
 
 from .config import level, output_file, auto_offset, hour_offset
 from .utils import set_background, get_desktop_environment
@@ -24,7 +24,7 @@ width = 550
 
 def get_time_offset(latest_date):
     if auto_offset:
-        local_date = datetime.now(timezone(str(get_localzone())))
+        local_date = datetime.now(tzlocal())
         himawari_date = datetime.now(timezone('Australia/Sydney'))
         local_offset = local_date.strftime("%z")
         himawari_offset = himawari_date.strftime("%z")
