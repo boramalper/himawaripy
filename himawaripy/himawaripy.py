@@ -9,17 +9,19 @@ from os import makedirs
 from os.path import dirname
 from time import strptime, strftime, mktime
 from urllib.request import urlopen
+from socket import timeout as TimeoutException
 
 from PIL import Image
 from pytz import timezone
 from dateutil.tz import tzlocal
 
-from .config import level, output_file, auto_offset, hour_offset
-from .utils import set_background, get_desktop_environment
+from config import level, output_file, auto_offset, hour_offset , dl_deadline
+from utils import set_background, get_desktop_environment
 
 counter = None
 height = 550
 width = 550
+dl_timeout = dl_deadline * 60 / (level ** 2)
 
 
 def get_time_offset(latest_date):
@@ -49,8 +51,9 @@ def download_chunk(args):
 
     x, y, latest = args
     url_format = "http://himawari8.nict.go.jp/img/D531106/{}d/{}/{}_{}_{}.png"
+    url = url_format.format(level, width, strftime("%Y/%m/%d/%H%M%S", latest), x, y)
 
-    with urlopen(url_format.format(level, width, strftime("%Y/%m/%d/%H%M%S", latest), x, y)) as tile_w:
+    with urlopen(url , timeout=dl_timeout) as tile_w:
         tiledata = tile_w.read()
 
     with counter.get_lock():
@@ -85,7 +88,10 @@ def main():
     counter = Value("i", 0)
     p = Pool(cpu_count() * level)
     print("Downloading tiles: 0/{} completed".format(level * level), end="", flush=True)
-    res = p.map(download_chunk, product(range(level), range(level), (requested_time,)))
+    try:
+        res = p.map(download_chunk, product(range(level), range(level), (requested_time,)))
+    except TimeoutException:
+        exit("\nTimeout while downloading tiles.")
 
     for (x, y, tiledata) in res:
         tile = Image.open(BytesIO(tiledata))
