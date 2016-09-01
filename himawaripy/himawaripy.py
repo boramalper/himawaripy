@@ -6,7 +6,7 @@ from itertools import product
 from json import loads
 from multiprocessing import Pool, cpu_count, Value
 from os import makedirs, remove
-from os.path import dirname, join
+from os.path import dirname, join, exists
 from time import strptime, strftime, mktime
 from urllib.request import urlopen
 from socket import timeout as TimeoutException
@@ -63,12 +63,12 @@ def download_chunk(args):
     return x, y, tiledata
 
 def is_discharging():
-    f = open('/sys/class/power_supply/BAT0/status', 'r')
-    status = f.readline().strip()
-    if status in [ "Discharging" ]:
-        return True
-    else:
-        return False
+    if exists("/sys/class/power_supply/BAT0/status"):
+        f = open('/sys/class/power_supply/BAT0/status', 'r')
+        status = f.readline().strip()
+        if status in [ "Discharging" ]:
+            return True
+    return False
 
 def main():
     global counter
