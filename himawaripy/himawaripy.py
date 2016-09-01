@@ -58,9 +58,20 @@ def download_chunk(args):
         print("\rDownloading tiles: {}/{} completed".format(counter.value, level * level), end="", flush=True)
     return x, y, tiledata
 
+def is_discharging():
+    f = open('/sys/class/power_supply/BAT0/status', 'r')
+    status = f.readline().strip()
+    if status in [ "Discharging" ]:
+        return True
+    else:
+        return False
 
 def main():
     global counter
+
+    if is_discharging():
+        print("Is discharging -> next time")
+        return True
 
     if auto_offset and hour_offset:
         exit("You can not set `auto_offset` to True and `hour_offset` to a value that is different than zero.")
