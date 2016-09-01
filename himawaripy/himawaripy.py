@@ -5,26 +5,29 @@ from io import BytesIO
 from itertools import product
 from json import loads
 from multiprocessing import Pool, cpu_count, Value
-from os import makedirs
-from os.path import dirname
+from os import makedirs, remove
+from os.path import dirname, join
 from time import strptime, strftime, mktime
 from urllib.request import urlopen
+from socket import timeout as TimeoutException
+from glob import iglob
 
 from PIL import Image
 from pytz import timezone
-from tzlocal import get_localzone
+from dateutil.tz import tzlocal
 
-from .config import level, output_file, auto_offset, hour_offset
+from .config import level, output_dir, auto_offset, hour_offset , dl_deadline
 from .utils import set_background, get_desktop_environment
 
 counter = None
 height = 550
 width = 550
+dl_timeout = dl_deadline * 60 / (level ** 2)
 
 
 def get_time_offset(latest_date):
     if auto_offset:
-        local_date = datetime.now(timezone(str(get_localzone())))
+        local_date = datetime.now(tzlocal())
         himawari_date = datetime.now(timezone('Australia/Sydney'))
         local_offset = local_date.strftime("%z")
         himawari_offset = himawari_date.strftime("%z")
@@ -49,8 +52,9 @@ def download_chunk(args):
 
     x, y, latest = args
     url_format = "http://himawari8.nict.go.jp/img/D531106/{}d/{}/{}_{}_{}.png"
+    url = url_format.format(level, width, strftime("%Y/%m/%d/%H%M%S", latest), x, y)
 
-    with urlopen(url_format.format(level, width, strftime("%Y/%m/%d/%H%M%S", latest), x, y)) as tile_w:
+    with urlopen(url , timeout=dl_timeout) as tile_w:
         tiledata = tile_w.read()
 
     with counter.get_lock():
@@ -93,15 +97,26 @@ def main():
 
     png = Image.new('RGB', (width * level, height * level))
 
-    counter = Value("i", 0)
-    p = Pool(cpu_count() * level)
-    print("Downloading tiles: 0/{} completed".format(level * level), end="", flush=True)
-    res = p.map(download_chunk, product(range(level), range(level), (requested_time,)))
+    try:
+        counter = Value("i", 0)
+        p = Pool(cpu_count() * level)
+        print("Downloading tiles: 0/{} completed".format(level * level), end="", flush=True)
+        try:
+            res = p.map(download_chunk, product(range(level), range(level), (requested_time,)))
+        except TimeoutException:
+            exit("\nTimeout while downloading tiles.")
+    finally:  # Make sure that we terminate proccess pool, whatever happens...
+        p.terminate()
+        p.join()
 
     for (x, y, tiledata) in res:
         tile = Image.open(BytesIO(tiledata))
         png.paste(tile, (width * x, height * y, width * (x + 1), height * (y + 1)))
 
+    for file in iglob(join(output_dir, "himawari-*.png")):
+        remove(file)
+
+    output_file = join(output_dir, strftime("himawari-%Y%m%dT%H%M%S.png", requested_time))
     print("\nSaving to '%s'..." % (output_file))
     makedirs(dirname(output_file), exist_ok=True)
     png.save(output_file, "PNG")

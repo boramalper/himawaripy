@@ -32,14 +32,6 @@ time to download the tiles.
 You can also change the path of the latest picture, which is by default
 `~/.himawari/himawari-latest.png`, by changing the `output_file` variable.
 
-### xfce4
-
-On xfce4, you can set which displays you want to change the background of using
-the xfce\_displays variable. If you get an error and you're not sure which
-display to use, you can find your display in the output of
-
-    xfconf-query --channel xfce4-desktop --list | grep last-image
-
 ### Nitrogen
 If you use nitrogen for setting your wallpaper, you have to enter this in your
 `~/.config/nitrogen/bg-saved.cfg`.
