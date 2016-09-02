@@ -41,6 +41,13 @@ If you use nitrogen for setting your wallpaper, you have to enter this in your
     mode=4
     bgcolor=#000000
 
+## Prerequisites
+
+You need a valid python3 installation including the python3-setuptools package:
+
+    sudo apt install python3
+    sudo apt install python3-setuptools 
+    
 ## Installation
 
     cd ~
