@@ -6,7 +6,7 @@ from itertools import product
 from json import loads
 from multiprocessing import Pool, cpu_count, Value
 from os import makedirs, remove
-from os.path import dirname, join
+from os.path import dirname, join, exists
 from time import strptime, strftime, mktime
 from urllib.request import urlopen
 from socket import timeout as TimeoutException
@@ -62,9 +62,20 @@ def download_chunk(args):
         print("\rDownloading tiles: {}/{} completed".format(counter.value, level * level), end="", flush=True)
     return x, y, tiledata
 
+def is_discharging():
+    if exists("/sys/class/power_supply/BAT0/status"):
+        f = open('/sys/class/power_supply/BAT0/status', 'r')
+        status = f.readline().strip()
+        if status in [ "Discharging" ]:
+            return True
+    return False
 
 def main():
     global counter
+
+    if is_discharging():
+        print("Is discharging -> next time")
+        return True
 
     if auto_offset and hour_offset:
         exit("You can not set `auto_offset` to True and `hour_offset` to a value that is different than zero.")
