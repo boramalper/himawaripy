@@ -28,7 +28,8 @@ def set_background(file_path):
     elif de == "lxde":
         subprocess.call(["pcmanfm", "--set-wallpaper", file_path, "--wallpaper-mode=fit", ])
     elif de == "mac":
-        subprocess.call(["osascript", "-e", 'tell application "System Events"\n'
+        subprocess.call(["osascript", "-e",
+                         'tell application "System Events"\n'
                          'set theDesktops to a reference to every desktop\n'
                          'repeat with aDesktop in theDesktops\n'
                          'set the picture of aDesktop to \"' + file_path + '"\nend repeat\nend tell'])
@@ -52,20 +53,19 @@ def set_background(file_path):
                                          "org.kde.PlasmaShell.evaluateScript", script.format(file_path)])
             except subprocess.CalledProcessError as e:
                 if "Widgets are locked" in e.output.decode("utf-8"):
-                    print("!! Cannot change the wallpaper while widgets are locked.")
-                    print("!! Please unlock widgets to allow wallpaper changing.\n")
+                    print("Cannot change the wallpaper while widgets are locked! (unlock the widgets)")
                 else:
-                    print(e)
+                    raise e
         else:
-            print("\nCouldn't detect plasmashell 5.7 or higher.")
+            print("Couldn't detect plasmashell 5.7 or higher.")
     elif has_program("feh"):
-        print("\nCouldn't detect your desktop environment ('{}'), but you have"
-              "'feh' installed so we will use it.".format(de))
+        print("Couldn't detect your desktop environment ('{}'), but you have"
+              "'feh' installed so we will use it...".format(de))
         os.environ['DISPLAY'] = ':0'
         subprocess.call(["feh", "--bg-max", file_path])
     elif has_program("nitrogen"):
-        print("\nCouldn't detect your desktop environment ('{}'), but you have "
-              "'nitrogen' installed so we will use it.".format(de))
+        print("Couldn't detect your desktop environment ('{}'), but you have "
+              "'nitrogen' installed so we will use it...".format(de))
         os.environ["DISPLAY"] = ':0'
         subprocess.call(["nitrogen", "--restore"])
     else:
@@ -145,7 +145,7 @@ def has_program(program):
 def plasma_version():
     try:
         output = subprocess.Popen(["plasmashell", "-v"], stdout=subprocess.PIPE).communicate()[0].decode("utf-8")
-        print("\nRunning", output)
+        print("Plasma version '{}'.".format(output))
         version = re.match(r"plasmashell (.*)", output).group(1)
         return LooseVersion(version)
     except (subprocess.CalledProcessError, IndexError):

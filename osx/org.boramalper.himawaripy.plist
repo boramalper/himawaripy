@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
   <key>Label</key>
-  <string>com.user.himawaripy</string>
+  <string>org.boramalper.himawaripy</string>
 
   <key>ProgramArguments</key>
   <array>

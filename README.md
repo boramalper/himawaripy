@@ -1,12 +1,14 @@
 # himawaripy
 *Put near-realtime picture of Earth as your desktop background*
 
+![By /u/hardypart](https://i.imgur.com/UoZMp5Y.gif)
+
 himawaripy is a Python 3 script that fetches near-realtime (10 minutes delayed)
 picture of Earth as its taken by
 [Himawari 8 (ひまわり8号)](https://en.wikipedia.org/wiki/Himawari_8) and sets it
 as your desktop background.
 
-Set a cronjob that runs in every 10 minutes to automatically get the
+Set a cronjob (or systemd service) that runs in every 10 minutes to automatically get the
 near-realtime picture of Earth.
 
 ## Supported Desktop Environments
@@ -24,13 +26,40 @@ near-realtime picture of Earth.
 * any other desktop environments that are not mentioned above.
 
 ## Configuration
-You can configure the level of detail, by modifying the script. You can set the
-global variable `level` to `4`, `8`, `16`, or `20` to increase the quality (and
-thus the file size as well). Please keep in mind that it will also take more
-time to download the tiles.
+    usage:  [-h] [--version] [--auto-offset | -o OFFSET] [-l {4,8,16,20}]
+            [-d DEADLINE] [--save-battery] [--output-dir OUTPUT_DIR]
+    
+    set (near-realtime) picture of Earth as your desktop background
+    
+    optional arguments:
+      -h, --help            show this help message and exit
+      --version             show program's version number and exit
+      --auto-offset         determine offset automatically
+      -o OFFSET, --offset OFFSET
+                            UTC time offset in hours, must be less than or equal
+                            to +10
+      -l {4,8,16,20}, --level {4,8,16,20}
+                            increases the quality (and the size) of each tile.
+                            possible values are 4, 8, 16, 20
+      -d DEADLINE, --deadline DEADLINE
+                            deadline in minutes to download all the tiles, set 0
+                            to cancel
+      --save-battery        stop updating on battery
+      --output-dir OUTPUT_DIR
+                            directory to save the temporary background image
 
-You can also change the path of the latest picture, which is by default
-`~/.himawari/himawari-latest.png`, by changing the `output_file` variable.
+Most of the time himawaripy can accurately detect your timezone if you pass the flag `--auto-offset`, although you may
+also set it manually by `-o` (or `--offset`) flag. If your timezone is beyond GMT by more than 10 hours, use the closest
+one (either `+10` or `-12`).
+
+Increasing the level will increase the quality of the image as well as the time taken to download all the tiles and the
+memory consumption. For instance choosing 20 will make himawaripy use ~700 MiB of memory at its peak and the image will
+be around ~200 MB.
+
+You should set a deadline compatible with your cronjob (or timer) settings to assure that script will terminate in X
+minutes before it is started again.
+
+You might use `--save-battery` to disable refreshing while running on battery power.
 
 ### Nitrogen
 If you use nitrogen for setting your wallpaper, you have to enter this in your
@@ -40,28 +69,19 @@ If you use nitrogen for setting your wallpaper, you have to enter this in your
     file=/home/USERNAME/.himawari/himawari-latest.png
     mode=4
     bgcolor=#000000
-
-## Prerequisites
-
-You need a valid python3 installation including the python3-setuptools package:
-
-    sudo apt install python3
-    sudo apt install python3-setuptools 
     
 ## Installation
+* You need a valid python3 installation including the python3-setuptools package
+
 
     cd ~
     git clone https://github.com/boramalper/himawaripy.git
-
-    # configure
-    cd ~/himawaripy/
-    vi himawaripy/config.py
 
     # install
     sudo python3 setup.py install
 
     # test whether it's working
-    himawaripy
+    himawaripy --auto-offset
 
     # Get the installation path of himawaripy by running the command
     which -- himawaripy
@@ -72,26 +92,28 @@ You need a valid python3 installation including the python3-setuptools package:
             crontab -e
 
             ### Add the line:
-            */10 * * * * <INSTALLATION_PATH>
+            */10 * * * * <INSTALLATION_PATH> # command line arguments here
 
         ## OR, alternatively use the provided systemd timer
 
             ### Configure
             vi systemd/himawaripy.service
-            # Replace "<INSTALLATION_PATH>" with the output of the aforementioned command.
+            # Replace "<INSTALLATION_PATH>" with the output of the aforementioned command and command line arguments
 
             ### Copy systemd configuration
-            cp systemd/himawaripy.{service,timer} $HOME/.config/systemd/user/
+            cp systemd/himawaripy.{service,timer} ~/.config/systemd/user/
 
             ### Enable and start the timer
             systemctl --user enable --now himawaripy.timer
 
 ### For KDE Users
 #### KDE 5.7+
-To change the wallpaper in KDE 5.7+, desktop widgets must be unlocked. If you dom't want to leave them unlocked, the pre-KDE 5.7 method can still be used.
+To change the wallpaper in KDE 5.7+, desktop widgets must be unlocked. If you dom't want to leave them unlocked,
+the pre-KDE 5.7 method can still be used.
 
 To unlock desktop widgets ([from the KDE userbase](https://userbase.kde.org/Plasma#Widgets)):
-> Open the Desktop Toolbox or the Panel Toolbox or right click on the Desktop - if you see an item labeled Unlock Widgets then select that, and then proceed to add widgets to your Desktop or your Panel. 
+> Open the Desktop Toolbox or the Panel Toolbox or right click on the Desktop - if you see an item labeled Unlock
+> Widgets then select that, and then proceed to add widgets to your Desktop or your Panel. 
 
 #### Before KDE 5.7
 > So the issue here is that KDE does not support changing the desktop wallpaper
@@ -112,18 +134,21 @@ Many thanks to [xenithorb](https://github.com/xenithorb) [for the solution](http
 
 ### For Mac OSX Users
 
-OSX has deprecated crontab, and replaced it with `launchd`. To set up a launch agent, copy the provided sample `plist` file in `osx/com.user.himawaripy.plist` to `~/Library/LaunchAgents`, and edit the following entries if required
+OSX has deprecated crontab, and replaced it with `launchd`. To set up a launch agent, copy the provided sample `plist`
+file in `osx/org.boramalper.himawaripy.plist` to `~/Library/LaunchAgents`, and edit the following entries if required
 
     mkdir -p ~/Library/LaunchAgents/
-    cp osx/com.user.himawaripy.plist ~/Library/LaunchAgents/
+    cp osx/org.boramalper.himawaripy.plist ~/Library/LaunchAgents/
 
-* `ProgrammingArguments` needs to be the `/path/to/himawaripy/installation`. This *should* be `/usr/local/bin/himawaripy` by default, but himawaripy may be installed elsewhere.
+* `ProgrammingArguments` needs to be the path to himawaripy installation. This *should* be `/usr/local/bin/himawaripy`
+by default, but himawaripy may be installed elsewhere.
 
-* `StartInterval` controls the interval between successive runs, set to 10 minutes (600 seconds) by default, edit as desired.
+* `StartInterval` controls the interval between successive runs, set to 10 minutes (600 seconds) by default,
+edit as desired.
 
 Finally, to launch it, enter this into the console:
 
-    launchctl load ~/Library/LaunchAgents/com.user.himawaripy.plist
+    launchctl load ~/Library/LaunchAgents/org.boramalper.himawaripy.plist
 
 
 ## Uninstallation
@@ -136,19 +161,11 @@ Finally, to launch it, enter this into the console:
     systemctl --user disable --now himawaripy.timer
     rm $HOME/.config/systemd/user/himawaripy.{timer,service}
 
-    # Remove the data directory
-    # By default, `~/.himawari`. Check `output_file` variable in config.py
-    # in case you've changed it.
-    rm -rf ~/.himawari
-
     # Uninstall the package
     sudo pip3 uninstall himawaripy
 
 If you would like to share why, you can contact me on github or
 [send an e-mail](mailto:bora@boramalper.org).
-
-## Example
-![Earth, as 2016/02/04/13:30:00 GMT](http://i.imgur.com/4XA6WaM.jpg)
 
 ## Attributions
 Thanks to *[MichaelPote](https://github.com/MichaelPote)* for the [initial
