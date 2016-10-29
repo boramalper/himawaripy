@@ -17,7 +17,7 @@ import threading
 import time
 
 import appdirs
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFilter
 from dateutil.tz import tzlocal
 
 from .utils import set_background, get_desktop_environment
@@ -90,6 +90,9 @@ def parse_args():
     parser.add_argument("--output-dir", type=str, dest="output_dir",
                         help="directory to save the temporary background image",
                         default=appdirs.user_cache_dir(appname="himawaripy", appauthor=False))
+    parser.add_argument("--composite-over", type=str, dest="composite_over",
+                        help="image to composite the background image over",
+                        default=None)
 
     args = parser.parse_args()
 
@@ -149,7 +152,17 @@ def thread_main(args):
     if args.auto_offset or args.offset != 10:
         print("Offset version: {} GMT.".format(strftime("%Y/%m/%d %H:%M:%S", requested_time)))
 
-    png = Image.new("RGB", (WIDTH * level, HEIGHT * level))
+    if args.composite_over is not None:
+        print("Opening image to composite over...")
+        try:
+            composite_img = Image.open(args.composite_over)
+        except Exception as e:
+            sys.exit("Unable to open --composite-over image!\n")
+
+    himawari_width = WIDTH * level
+    himawari_height = HEIGHT * level
+    himawari_img = Image.new("RGB", (himawari_width, himawari_height))
+    output_img = himawari_img
 
     p = mp_dummy.Pool(level * level)
     print("Downloading tiles...")
@@ -157,7 +170,34 @@ def thread_main(args):
 
     for (x, y, tiledata) in res:
         tile = Image.open(io.BytesIO(tiledata))
-        png.paste(tile, (WIDTH * x, HEIGHT * y, WIDTH * (x + 1), HEIGHT * (y + 1)))
+        himawari_img.paste(tile, (WIDTH * x, HEIGHT * y, WIDTH * (x + 1), HEIGHT * (y + 1)))
+
+    if args.composite_over is not None:
+        print("Compositing over input image")
+        composite_width, composite_height = composite_img.size
+        resize_ratio = min(composite_width / himawari_width, composite_height / himawari_height)
+
+        himawari_img = himawari_img.resize((round(himawari_width * resize_ratio), round(himawari_height * resize_ratio)),
+            Image.ANTIALIAS)
+
+        radius_img = min(himawari_width, himawari_height) * resize_ratio / 2
+        himawari_center_img = Image.new("RGB", (composite_width, composite_height), "black")
+        himawari_center_img.paste(himawari_img, (round(composite_width / 2 - radius_img), round(composite_height / 2 - radius_img)))
+
+        radius = min(himawari_width, himawari_height) * resize_ratio * 0.988 / 2
+        left = round(composite_width / 2 - radius)
+        right = round(composite_width / 2 + radius)
+        top = round(composite_height / 2 - radius)
+        bottom = round(composite_height / 2 + radius)
+
+        mask_img = Image.new("L", (composite_width, composite_height), "black")
+        draw = ImageDraw.Draw(mask_img)
+        draw.ellipse((left, top, right, bottom), fill='white')
+        mask_img = mask_img.filter(ImageFilter.GaussianBlur(radius=2))
+
+        composite_img.paste(himawari_center_img, (0, 0), mask_img)
+
+        output_img = composite_img
 
     for file in iglob(path.join(args.output_dir, "himawari-*.png")):
         os.remove(file)
@@ -165,7 +205,7 @@ def thread_main(args):
     output_file = path.join(args.output_dir, strftime("himawari-%Y%m%dT%H%M%S.png", requested_time))
     print("Saving to '%s'..." % (output_file,))
     os.makedirs(path.dirname(output_file), exist_ok=True)
-    png.save(output_file, "PNG")
+    output_img.save(output_file, "PNG")
 
     if not set_background(output_file):
         sys.exit("Your desktop environment '{}' is not supported!\n".format(get_desktop_environment()))
