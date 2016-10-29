@@ -47,6 +47,9 @@ near-realtime picture of Earth.
       --save-battery        stop updating on battery
       --output-dir OUTPUT_DIR
                             directory to save the temporary background image
+      --composite-over COMPOSITE_OVER
+                            image to composite the background image over
+
 
 Most of the time himawaripy can accurately detect your timezone if you pass the flag `--auto-offset`, although you may
 also set it manually by `-o` (or `--offset`) flag. If your timezone is beyond GMT by more than 10 hours, use the closest
@@ -60,6 +63,8 @@ You should set a deadline compatible with your cronjob (or timer) settings to as
 minutes before it is started again.
 
 You might use `--save-battery` to disable refreshing while running on battery power.
+
+If you pass an image path with `--composite-over`, the image from himawaripy will be scaled to fit inside, centered, and pasted over it to be used as the background instead. This works great with, for example, [an image of the Milky Way](https://wallpaperscraft.com/image/milky_way_stars_space_nebula_68885_3840x2160.jpg).
 
 ### Nitrogen
 If you use nitrogen for setting your wallpaper, you have to enter this in your
