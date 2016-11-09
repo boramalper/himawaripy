@@ -24,7 +24,7 @@ from .utils import set_background, get_desktop_environment
 
 
 # Semantic Versioning: Major, Minor, Patch
-HIMAWARIPY_VERSION = (2, 0, 0)
+HIMAWARIPY_VERSION = (2, 1, 0)
 counter = None
 HEIGHT = 550
 WIDTH = 550
@@ -90,6 +90,18 @@ def parse_args():
     parser.add_argument("--output-dir", type=str, dest="output_dir",
                         help="directory to save the temporary background image",
                         default=appdirs.user_cache_dir(appname="himawaripy", appauthor=False))
+    parser.add_argument("--crop", action="store_true", dest="crop",
+                        help="crop final image to monitor size, not default",
+                        default=False)
+    parser.add_argument("--monitors", "-m", type=int, dest="number_of_monitors",
+                        help="number of monitors",
+                        default=1)
+    parser.add_argument("--width", type=int, dest="monitor_width",
+                        help="directory to save the temporary background image",
+                        default=2880)
+    parser.add_argument("--height", type=int, dest="monitor_height",
+                        help="directory to save the temporary background image",
+                        default=1800)
 
     args = parser.parse_args()
 
@@ -161,6 +173,18 @@ def thread_main(args):
 
     for file in iglob(path.join(args.output_dir, "himawari-*.png")):
         os.remove(file)
+
+    if args.crop:
+        w, h = png.size
+        print("PNG Size: {}x{}".format(w, h))
+        crop_left = round((w / 2) - ((args.monitor_width * args.number_of_monitors) / 2))
+        crop_right = crop_left + (args.monitor_width * args.number_of_monitors)
+        crop_bottom = h
+        crop_top = crop_bottom - args.monitor_height
+        if crop_left < 0 or crop_right > w:
+            exit("\nUnable to crop, image too small for designated crop size ({}x{} > {}x{} source image)".format(args.monitor_width*args.number_of_monitors, args.monitor_height, w, h))
+        print("Crop size: {}x{}".format(args.monitor_width*args.number_of_monitors, args.monitor_height))
+        png = png.crop((crop_left, crop_top, crop_right, crop_bottom))
 
     output_file = path.join(args.output_dir, strftime("himawari-%Y%m%dT%H%M%S.png", requested_time))
     print("Saving to '%s'..." % (output_file,))
