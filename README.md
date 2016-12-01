@@ -19,6 +19,7 @@ near-realtime picture of Earth.
 * GNOME 3
 * Cinnamon 2.8.8
 * KDE
+* Deepin-Desktop
 
 ### Not Supported
 * any other desktop environments that are not mentioned above.
@@ -46,8 +47,8 @@ If you use nitrogen for setting your wallpaper, you have to enter this in your
 You need a valid python3 installation including the python3-setuptools package:
 
     sudo apt install python3
-    sudo apt install python3-setuptools 
-    
+    sudo apt install python3-setuptools
+
 ## Installation
 
     cd ~
@@ -91,7 +92,7 @@ You need a valid python3 installation including the python3-setuptools package:
 To change the wallpaper in KDE 5.7+, desktop widgets must be unlocked. If you dom't want to leave them unlocked, the pre-KDE 5.7 method can still be used.
 
 To unlock desktop widgets ([from the KDE userbase](https://userbase.kde.org/Plasma#Widgets)):
-> Open the Desktop Toolbox or the Panel Toolbox or right click on the Desktop - if you see an item labeled Unlock Widgets then select that, and then proceed to add widgets to your Desktop or your Panel. 
+> Open the Desktop Toolbox or the Panel Toolbox or right click on the Desktop - if you see an item labeled Unlock Widgets then select that, and then proceed to add widgets to your Desktop or your Panel.
 
 #### Before KDE 5.7
 > So the issue here is that KDE does not support changing the desktop wallpaper
