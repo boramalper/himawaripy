@@ -8,7 +8,8 @@ from distutils.version import LooseVersion
 def set_background(file_path):
     de = get_desktop_environment()
 
-    if de in ["gnome", "unity", "cinnamon", "pantheon", "gnome-classic"]:
+    if de in ["gnome", "unity", "cinnamon", "pantheon", "gnome-classic",
+              "deepin"]:
         # Because of a bug and stupid design of gsettings, see http://askubuntu.com/a/418521/388226
         if de == "unity":
             subprocess.call(["gsettings", "set", "org.gnome.desktop.background", "draw-background", "false"])
@@ -90,7 +91,7 @@ def get_desktop_environment():
             desktop_session = desktop_session.lower()
             if desktop_session in ["gnome", "unity", "cinnamon", "mate", "xfce4", "lxde", "fluxbox",
                                    "blackbox", "openbox", "icewm", "jwm", "afterstep", "trinity", "kde", "pantheon",
-                                   "gnome-classic", "i3"]:
+                                   "gnome-classic", "i3", "deepin"]:
                 return desktop_session
             ## Special cases ##
             # Canonical sets $DESKTOP_SESSION to Lubuntu rather than LXDE if using LXDE.
