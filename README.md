@@ -124,7 +124,14 @@ OSX has deprecated crontab, and replaced it with `launchd`. To set up a launch a
 Finally, to launch it, enter this into the console:
 
     launchctl load ~/Library/LaunchAgents/com.user.himawaripy.plist
+    
+### For Gnome3 Users
 
+First make sure you have `pip3` command valid,if not,then install it first by the follow command 
+```
+sudo apt-get install python3-pip
+``` 
+then follow the normal steps to install the repo,if any error occurred,google to find an fix! have fun!
 
 ## Uninstallation
     # Remove the cronjob
