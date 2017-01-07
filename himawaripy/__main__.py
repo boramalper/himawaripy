@@ -24,7 +24,7 @@ from .utils import set_background, get_desktop_environment
 
 
 # Semantic Versioning: Major, Minor, Patch
-HIMAWARIPY_VERSION = (2, 0, 0)
+HIMAWARIPY_VERSION = (2, 0, 1)
 counter = None
 HEIGHT = 550
 WIDTH = 550

@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="himawaripy",
-    version="2.0.0",
+    version="2.0.1",
     url="http://labs.boramalper.org/himawaripy",
     author="Mert Bora Alper",
     author_email="bora@boramalper.org",
