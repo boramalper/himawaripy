@@ -26,27 +26,30 @@ near-realtime picture of Earth.
 * any other desktop environments that are not mentioned above.
 
 ## Configuration
-    usage:  [-h] [--version] [--auto-offset | -o OFFSET] [-l {4,8,16,20}]
-            [-d DEADLINE] [--save-battery] [--output-dir OUTPUT_DIR]
-    
-    set (near-realtime) picture of Earth as your desktop background
-    
-    optional arguments:
-      -h, --help            show this help message and exit
-      --version             show program's version number and exit
-      --auto-offset         determine offset automatically
-      -o OFFSET, --offset OFFSET
-                            UTC time offset in hours, must be less than or equal
-                            to +10
-      -l {4,8,16,20}, --level {4,8,16,20}
-                            increases the quality (and the size) of each tile.
-                            possible values are 4, 8, 16, 20
-      -d DEADLINE, --deadline DEADLINE
-                            deadline in minutes to download all the tiles, set 0
-                            to cancel
-      --save-battery        stop updating on battery
-      --output-dir OUTPUT_DIR
-                            directory to save the temporary background image
+
+```
+usage:  [-h] [--version] [--auto-offset | -o OFFSET] [-l {4,8,16,20}]
+        [-d DEADLINE] [--save-battery] [--output-dir OUTPUT_DIR]
+
+set (near-realtime) picture of Earth as your desktop background
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+  --auto-offset         determine offset automatically
+  -o OFFSET, --offset OFFSET
+                        UTC time offset in hours, must be less than or equal
+                        to +10
+  -l {4,8,16,20}, --level {4,8,16,20}
+                        increases the quality (and the size) of each tile.
+                        possible values are 4, 8, 16, 20
+  -d DEADLINE, --deadline DEADLINE
+                        deadline in minutes to download all the tiles, set 0
+                        to cancel
+  --save-battery        stop updating on battery
+  --output-dir OUTPUT_DIR
+                        directory to save the temporary background image
+```
 
 Most of the time himawaripy can accurately detect your timezone if you pass the flag `--auto-offset`, although you may
 also set it manually by `-o` (or `--offset`) flag. If your timezone is beyond GMT by more than 10 hours, use the closest
@@ -65,46 +68,49 @@ You might use `--save-battery` to disable refreshing while running on battery po
 If you use nitrogen for setting your wallpaper, you have to enter this in your
 `~/.config/nitrogen/bg-saved.cfg`.
 
-    [:0.0]
-    file=/home/USERNAME/.himawari/himawari-latest.png
-    mode=4
-    bgcolor=#000000
-    
+```
+[:0.0]
+file=/home/USERNAME/.himawari/himawari-latest.png
+mode=4
+bgcolor=#000000
+```
+
 ## Installation
 * You need a valid python3 installation including the python3-setuptools package
 
+```
+cd ~
+git clone https://github.com/boramalper/himawaripy.git
 
-    cd ~
-    git clone https://github.com/boramalper/himawaripy.git
+# install
+sudo python3 setup.py install
 
-    # install
-    sudo python3 setup.py install
+# test whether it's working
+himawaripy --auto-offset
 
-    # test whether it's working
-    himawaripy --auto-offset
+# Get the installation path of himawaripy by running the command
+which -- himawaripy
 
-    # Get the installation path of himawaripy by running the command
-    which -- himawaripy
+# Set himawaripy to be called periodically
 
-    # Set himawaripy to be called periodically
+    ## Either set up a cronjob
+        crontab -e
 
-        ## Either set up a cronjob
-            crontab -e
+        ### Add the line:
+        */10 * * * * <INSTALLATION_PATH> # command line arguments here
 
-            ### Add the line:
-            */10 * * * * <INSTALLATION_PATH> # command line arguments here
+    ## OR, alternatively use the provided systemd timer
 
-        ## OR, alternatively use the provided systemd timer
+        ### Configure
+        vi systemd/himawaripy.service
+        # Replace "<INSTALLATION_PATH>" with the output of the aforementioned command and command line arguments
 
-            ### Configure
-            vi systemd/himawaripy.service
-            # Replace "<INSTALLATION_PATH>" with the output of the aforementioned command and command line arguments
+        ### Copy systemd configuration
+        cp systemd/himawaripy.{service,timer} ~/.config/systemd/user/
 
-            ### Copy systemd configuration
-            cp systemd/himawaripy.{service,timer} ~/.config/systemd/user/
-
-            ### Enable and start the timer
-            systemctl --user enable --now himawaripy.timer
+        ### Enable and start the timer
+        systemctl --user enable --now himawaripy.timer
+```
 
 ### For KDE Users
 #### KDE 5.7+
@@ -152,17 +158,26 @@ Finally, to launch it, enter this into the console:
 
 
 ## Uninstallation
-    # Remove the cronjob
-    crontab -e
-    # Remove the line
-    */10 * * * * <INSTALLATION_PATH>
 
-    # OR if you used the systemd timer
-    systemctl --user disable --now himawaripy.timer
-    rm $HOME/.config/systemd/user/himawaripy.{timer,service}
+```
+# Remove the cronjob
+crontab -e
+# Remove the line
+*/10 * * * * <INSTALLATION_PATH>
 
-    # Uninstall the package
-    sudo pip3 uninstall himawaripy
+# OR if you used the systemd timer
+systemctl --user disable --now himawaripy.timer
+rm $HOME/.config/systemd/user/himawaripy.{timer,service}
+
+# Uninstall the binary
+sudo rm -f <INSTALLATION_PATH>
+
+# Uninstall the package
+sudo pip3 uninstall himawaripy
+```
+
+
+`<INSTALLATION_PATH>` can be found using the command `which -- himawaripy`.
 
 If you would like to share why, you can contact me on github or
 [send an e-mail](mailto:bora@boramalper.org).
