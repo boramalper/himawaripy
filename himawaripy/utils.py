@@ -124,7 +124,7 @@ def get_desktop_environment():
     current_desktop = os.environ.get("XDG_CURRENT_DESKTOP")
     if current_desktop:
         current_desktop = current_desktop.lower()
-        if current_desktop in ["gnome", "unity", "kde", "gnome-classic", "mate"]:
+        if current_desktop in ["gnome", "unity", "kde", "gnome-classic", "mate", "lxde"]:
             return current_desktop
 
         # Special Cases
