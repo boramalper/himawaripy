@@ -109,6 +109,8 @@ def get_desktop_environment():
                 return "razor-qt"
             elif desktop_session.startswith("wmaker"):  # e.g. wmaker-common
                 return "windowmaker"
+            elif desktop_session.startswith("peppermint"):
+                return "gnome"
         if os.environ.get('KDE_FULL_SESSION') == 'true':
             return "kde"
         elif os.environ.get('GNOME_DESKTOP_SESSION_ID'):
