@@ -59,6 +59,11 @@ def download_chunk(args):
 
     tiledata = download(url)
 
+    # If the tile data is 2867 bytes, it is a blank "No Image" tile.
+    if tiledata.__sizeof__() == 2867:
+        print('No image available for {}.'.format(strftime("%Y/%m/%d %H:%M:%S", latest)))
+        os._exit(3)
+
     with counter.get_lock():
         counter.value += 1
         if counter.value == level * level:
