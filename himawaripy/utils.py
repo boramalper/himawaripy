@@ -61,7 +61,7 @@ def set_background(file_path):
         else:
             print("Couldn't detect plasmashell 5.7 or higher.")
     elif has_program("feh"):
-        print("Couldn't detect your desktop environment ('{}'), but you have"
+        print("Couldn't detect your desktop environment ('{}'), but you have "
               "'feh' installed so we will use it...".format(de))
         os.environ['DISPLAY'] = ':0'
         subprocess.call(["feh", "--bg-max", file_path])
