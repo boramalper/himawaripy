@@ -15,6 +15,7 @@ import urllib.request
 from glob import iglob, glob
 import threading
 import time
+import subprocess
 
 import appdirs
 from PIL import Image
@@ -108,16 +109,19 @@ def parse_args():
 
 
 def is_discharging():
-    if not sys.platform.startswith("linux"):  # I hope this will not end up like Windows 95/98 checks one day...
-        sys.exit("Battery saving feature works only on linux!\n")
+    if sys.platform.startswith("linux"):
+        if len(glob("/sys/class/power_supply/BAT*")) > 1:
+            print("Multiple batteries detected, using BAT0.")
 
-    if len(glob("/sys/class/power_supply/BAT*")) > 1:
-        print("Multiple batteries detected, using BAT0.")
+        with open("/sys/class/power_supply/BAT0/status") as f:
+            status = f.readline().strip()
 
-    with open("/sys/class/power_supply/BAT0/status") as f:
-        status = f.readline().strip()
+            return status == "Discharging"
+    elif sys.platform == 'darwin':
+        return b'discharging' in subprocess.check_output(["pmset", "-g", "batt"])
 
-        return status == "Discharging"
+    else:
+        sys.exit("Battery saving feature works only on linux or mac!\n")
 
 
 def download(url):
