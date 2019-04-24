@@ -28,8 +28,9 @@ near-realtime picture of Earth.
 ## Configuration
 
 ```
-usage:  [-h] [--version] [--auto-offset | -o OFFSET] [-l {4,8,16,20}]
-        [-d DEADLINE] [--save-battery] [--output-dir OUTPUT_DIR]
+usage: himawaripy [-h] [--version] [--auto-offset | -o OFFSET]
+                  [-l {4,8,16,20}] [-d DEADLINE] [--save-battery]
+                  [--output-dir OUTPUT_DIR] [--dont-change]
 
 set (near-realtime) picture of Earth as your desktop background
 
@@ -46,9 +47,11 @@ optional arguments:
   -d DEADLINE, --deadline DEADLINE
                         deadline in minutes to download all the tiles, set 0
                         to cancel
-  --save-battery        stop updating on battery
+  --save-battery        stop refreshing on battery
   --output-dir OUTPUT_DIR
                         directory to save the temporary background image
+  --dont-change         don't change the wallpaper (just download it)
+
 ```
 
 Most of the time himawaripy can accurately detect your timezone if you pass the flag `--auto-offset`, although you may
@@ -63,6 +66,9 @@ You should set a deadline compatible with your cronjob (or timer) settings to as
 minutes before it is started again.
 
 You might use `--save-battery` to disable refreshing while running on battery power.
+
+You might also ask himawaripy to not to change your wallpaper by `--dont-change`
+if you would it to download the image and stop.
 
 ### Nitrogen
 If you use nitrogen for setting your wallpaper, you have to enter this in your
@@ -79,13 +85,10 @@ bgcolor=#000000
 * You need a valid python3 installation including the python3-setuptools package
 
 ```
-cd ~
-git clone https://github.com/boramalper/himawaripy.git
+# Install
+pip install --user himawaripy
 
-# install
-sudo python3 setup.py install
-
-# test whether it's working
+# Test whether it's working
 himawaripy --auto-offset
 
 # Get the installation path of himawaripy by running the command
@@ -102,7 +105,7 @@ which -- himawaripy
     ## OR, alternatively use the provided systemd timer
 
         ### Configure
-        vi systemd/himawaripy.service
+        nano systemd/himawaripy.service
         # Replace "<INSTALLATION_PATH>" with the output of the aforementioned command and command line arguments
 
         ### Copy systemd configuration
@@ -160,20 +163,17 @@ Finally, to launch it, enter this into the console:
 ## Uninstallation
 
 ```
-# Remove the cronjob
-crontab -e
-# Remove the line
-*/10 * * * * <INSTALLATION_PATH>
+# Either remove the cronjob
+crontab -e    
+    # Remove the line
+    */10 * * * * himawaripy...
 
 # OR if you used the systemd timer
 systemctl --user disable --now himawaripy.timer
 rm $HOME/.config/systemd/user/himawaripy.{timer,service}
 
-# Uninstall the binary
-sudo rm -f <INSTALLATION_PATH>
-
 # Uninstall the package
-sudo pip3 uninstall himawaripy
+pip3 uninstall himawaripy
 ```
 
 
