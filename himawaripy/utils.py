@@ -20,7 +20,7 @@ def set_background(file_path):
         # feh and nitrogen (might) require it.
         fetch_envvar("DISPLAY")
 
-        if de in ["gnome", "unity", "cinnamon", "pantheon", "gnome-classic"]:
+        if de in ["gnome", "unity", "cinnamon", "pantheon", "gnome-classic", "budgie-desktop"]:
             # Because of a bug and stupid design of gsettings, see http://askubuntu.com/a/418521/388226
             if de == "unity":
                 subprocess.call(["gsettings", "set", "org.gnome.desktop.background", "draw-background", "false"])
@@ -44,7 +44,7 @@ def set_background(file_path):
         elif de == "kde":
             if plasma_version() > LooseVersion("5.7"):
                 ''' Command per https://github.com/boramalper/himawaripy/issues/57
-    
+
                     Sets 'FillMode' to 1, which is "Scaled, Keep Proportions"
                     Forces 'Color' to black, which sets the background colour.
                 '''
@@ -99,7 +99,7 @@ def get_desktop_environment():
             desktop_session = desktop_session.lower()
             if desktop_session in ["gnome", "unity", "cinnamon", "mate", "xfce4", "lxde", "fluxbox",
                                    "blackbox", "openbox", "icewm", "jwm", "afterstep", "trinity", "kde", "pantheon",
-                                   "gnome-classic", "i3"]:
+                                   "gnome-classic", "i3", "budgie-desktop"]:
                 return desktop_session
             ## Special cases ##
             # Canonical sets $DESKTOP_SESSION to Lubuntu rather than LXDE if using LXDE.
