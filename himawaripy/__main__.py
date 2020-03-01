@@ -16,6 +16,7 @@ from glob import iglob, glob
 import threading
 import time
 import subprocess
+import random as rd
 
 import appdirs
 from PIL import Image
@@ -97,6 +98,8 @@ def parse_args():
                         default=appdirs.user_cache_dir(appname="himawaripy", appauthor=False))
     parser.add_argument("--dont-change", action="store_true", dest="dont_change", default=False,
                         help="don't change the wallpaper (just download it)")
+    parser.add_argument("--zoom", action="store_true", dest="zoom", default=False,
+                        help="use a random zoomed-in part of the picture")
 
     args = parser.parse_args()
 
@@ -159,15 +162,26 @@ def thread_main(args):
     if args.auto_offset or args.offset != 10:
         print("Offset version: {} GMT.".format(strftime("%Y/%m/%d %H:%M:%S", requested_time)))
 
-    png = Image.new("RGB", (WIDTH * level, HEIGHT * level))
+    if args.zoom == False:
+	    png = Image.new("RGB", (WIDTH * level, HEIGHT * level))
+	    p = mp_dummy.Pool(level * level)
+	    print("Downloading tiles...")
+	    res = p.map(download_chunk, it.product(range(level), range(level), (requested_time,), (args.level,)))
 
-    p = mp_dummy.Pool(level * level)
-    print("Downloading tiles...")
-    res = p.map(download_chunk, it.product(range(level), range(level), (requested_time,), (args.level,)))
+	    for (x, y, tiledata) in res:
+	        tile = Image.open(io.BytesIO(tiledata))
+	        png.paste(tile, (WIDTH * x, HEIGHT * y, WIDTH * (x + 1), HEIGHT * (y + 1)))
+    else:
+	    png = Image.new("RGB", (WIDTH * 3, HEIGHT * 3))
+	    p = mp_dummy.Pool(3 * 3)
+	    randx = rd.randrange(0,level-2,1)
+	    randy = rd.randrange(0,level-2,1)
+	    print("Downloading partial tiles...")
+	    res = p.map(download_chunk, it.product(range(randx,randx+3), range(randy,randy+3), (requested_time,), (args.level,)))
 
-    for (x, y, tiledata) in res:
-        tile = Image.open(io.BytesIO(tiledata))
-        png.paste(tile, (WIDTH * x, HEIGHT * y, WIDTH * (x + 1), HEIGHT * (y + 1)))
+	    for (x, y, tiledata) in res:
+	        tile = Image.open(io.BytesIO(tiledata))
+	        png.paste(tile, (WIDTH * (x-randx), HEIGHT * (y-randy), WIDTH * ((x-randx) + 1), HEIGHT * ((y-randy) + 1)))
 
     for file in iglob(path.join(args.output_dir, "himawari-*.png")):
         os.remove(file)

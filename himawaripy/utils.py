@@ -25,8 +25,11 @@ def set_background(file_path):
             if de == "unity":
                 subprocess.call(["gsettings", "set", "org.gnome.desktop.background", "draw-background", "false"])
             subprocess.call(["gsettings", "set", "org.gnome.desktop.background", "picture-uri", "file://" + file_path])
-            subprocess.call(["gsettings", "set", "org.gnome.desktop.background", "picture-options", "scaled"])
+            subprocess.call(["gsettings", "set", "org.gnome.desktop.background", "picture-options", "zoom"])
             subprocess.call(["gsettings", "set", "org.gnome.desktop.background", "primary-color", "#000000"])
+            #set as lock screen too
+            #subprocess.call(["gsettings", "set", "org.gnome.desktop.screensaver", "picture-uri", "file://" + file_path])
+            #subprocess.call(["gsettings", "set", "org.gnome.desktop.screensaver", "picture-options", "zoom"])
             if de == "unity":
                 assert os.system('bash -c "gsettings set org.gnome.desktop.background draw-background true"') == 0
         elif de == "mate":
