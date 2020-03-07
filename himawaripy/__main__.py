@@ -17,6 +17,7 @@ import threading
 import time
 import subprocess
 import random as rd
+from math import sin, radians, floor
 
 import appdirs
 from PIL import Image
@@ -163,25 +164,35 @@ def thread_main(args):
         print("Offset version: {} GMT.".format(strftime("%Y/%m/%d %H:%M:%S", requested_time)))
 
     if args.zoom == False:
-	    png = Image.new("RGB", (WIDTH * level, HEIGHT * level))
-	    p = mp_dummy.Pool(level * level)
-	    print("Downloading tiles...")
-	    res = p.map(download_chunk, it.product(range(level), range(level), (requested_time,), (args.level,)))
+        png = Image.new("RGB", (WIDTH * level, HEIGHT * level))
+        p = mp_dummy.Pool(level * level)
+        print("Downloading tiles...")
+        res = p.map(download_chunk, it.product(range(level), range(level), (requested_time,), (args.level,)))
 
-	    for (x, y, tiledata) in res:
-	        tile = Image.open(io.BytesIO(tiledata))
-	        png.paste(tile, (WIDTH * x, HEIGHT * y, WIDTH * (x + 1), HEIGHT * (y + 1)))
+        for (x, y, tiledata) in res:
+            tile = Image.open(io.BytesIO(tiledata))
+            png.paste(tile, (WIDTH * x, HEIGHT * y, WIDTH * (x + 1), HEIGHT * (y + 1)))
     else:
-	    png = Image.new("RGB", (WIDTH * 3, HEIGHT * 3))
-	    p = mp_dummy.Pool(3 * 3)
-	    randx = rd.randrange(0,level-2,1)
-	    randy = rd.randrange(0,level-2,1)
-	    print("Downloading partial tiles...")
-	    res = p.map(download_chunk, it.product(range(randx,randx+3), range(randy,randy+3), (requested_time,), (args.level,)))
+        png = Image.new("RGB", (WIDTH * 3, HEIGHT * 3))
+        p = mp_dummy.Pool(3 * 3)
+        #set boundry such that we don't look at complete darkness
+        h = datetime.now().hour
+        lower = floor(level/2+level/2*sin(radians(min(h/24*360+90,270))))
+        upper = floor(level/2+level/2*sin(radians(max(h/24*360-90,90))))
+        if lower == upper:
+            if h > 21:
+                randx = 0 #look at sunset(leftmost of image)
+            else:
+                randx = level-3 #look at sunrise(rightmost)
+        else:
+            randx = min(level-3, rd.randrange(lower,upper,1))
+        randy = rd.randrange(0,level-2,1)
+        print("Downloading partial tiles...")
+        res = p.map(download_chunk, it.product(range(randx,randx+3), range(randy,randy+3), (requested_time,), (args.level,)))
 
-	    for (x, y, tiledata) in res:
-	        tile = Image.open(io.BytesIO(tiledata))
-	        png.paste(tile, (WIDTH * (x-randx), HEIGHT * (y-randy), WIDTH * ((x-randx) + 1), HEIGHT * ((y-randy) + 1)))
+        for (x, y, tiledata) in res:
+            tile = Image.open(io.BytesIO(tiledata))
+            png.paste(tile, (WIDTH * (x-randx), HEIGHT * (y-randy), WIDTH * ((x-randx) + 1), HEIGHT * ((y-randy) + 1)))
 
     for file in iglob(path.join(args.output_dir, "himawari-*.png")):
         os.remove(file)
