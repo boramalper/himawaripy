@@ -203,7 +203,7 @@ def thread_main(args):
     png.save(output_file, "PNG")
 
     if not args.dont_change:
-        r = set_background(output_file)
+        r = set_background(output_file,args.zoom)
         if not r:
             sys.exit("Your desktop environment '{}' is not supported!\n".format(get_desktop_environment()))
     else:
