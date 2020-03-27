@@ -30,7 +30,7 @@ near-realtime picture of Earth.
 ```
 usage: himawaripy [-h] [--version] [--auto-offset | -o OFFSET]
                   [-l {4,8,16,20}] [-d DEADLINE] [--save-battery]
-                  [--output-dir OUTPUT_DIR] [--dont-change]
+                  [--output-dir OUTPUT_DIR] [--dont-change] [--zoom]
 
 set (near-realtime) picture of Earth as your desktop background
 
@@ -51,7 +51,7 @@ optional arguments:
   --output-dir OUTPUT_DIR
                         directory to save the temporary background image
   --dont-change         don't change the wallpaper (just download it)
-
+  --zoom                only use a random zoomed-in part of the picture
 ```
 
 Most of the time himawaripy can accurately detect your timezone if you pass the flag `--auto-offset`, although you may
