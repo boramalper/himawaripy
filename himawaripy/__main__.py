@@ -164,13 +164,13 @@ def thread_main(args):
         print("Offset version: {} GMT.".format(strftime("%Y/%m/%d %H:%M:%S", requested_time)))
 
     if args.zoom == False:
-        imgsize = level
+        tilenum = level
         offset_x = 0
         offset_y = 0
-        copyrange_x = range(imgsize)
-        copyrange_y = range(imgsize)
+        copyrange_x = range(tilenum)
+        copyrange_y = range(tilenum)
     else:
-        imgsize = 3 #crop a 3*3 out of the level*level image 
+        tilenum = 3 #crop a 3*3 out of the level*level image 
         #set boundry such that we don't look at complete darkness
         h = requested_time.tm_hour
         lower = floor(level/2+level/2*sin(radians(min(h/24*360+90,270))))
@@ -186,10 +186,10 @@ def thread_main(args):
         copyrange_x = range(offset_x,offset_x+3)
         copyrange_y = range(offset_y,offset_y+3)
  
-    png = Image.new("RGB", (WIDTH * imgsize, HEIGHT * imgsize))
-    p = mp_dummy.Pool(imgsize * imgsize)
-    res = p.map(download_chunk, it.product(copyrange_x, copyrange_y, (requested_time,), (args.level,)))
+    png = Image.new("RGB", (WIDTH * tilenum, HEIGHT * tilenum))
+    p = mp_dummy.Pool(tilenum * tilenum)
     print("Downloading tiles...")
+    res = p.map(download_chunk, it.product(copyrange_x, copyrange_y, (requested_time,), (args.level,)))
     for (x, y, tiledata) in res:
         tile = Image.open(io.BytesIO(tiledata))
         png.paste(tile, (WIDTH * (x-offset_x), HEIGHT * (y-offset_y), WIDTH * ((x-offset_x) + 1), HEIGHT * ((y-offset_y) + 1)))
