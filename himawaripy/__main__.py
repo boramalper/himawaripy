@@ -169,11 +169,10 @@ def thread_main(args):
         offset_y = 0
         copyrange_x = range(imgsize)
         copyrange_y = range(imgsize)
-
     else:
         imgsize = 3 #crop a 3*3 out of the level*level image 
         #set boundry such that we don't look at complete darkness
-        h = datetime.now().hour
+        h = requested_time.tm_hour
         lower = floor(level/2+level/2*sin(radians(min(h/24*360+90,270))))
         upper = floor(level/2+level/2*sin(radians(max(h/24*360-90,90))))
         if lower == upper:
