@@ -5,4 +5,5 @@ Description=Update desktop background with satellite imagery
 
 [Service]
 Type=oneshot
-ExecStart=<INSTALLATION_PATH> # command line arguments here
+# Place command line arguments into ExecStart
+ExecStart=<INSTALLATION_PATH>
