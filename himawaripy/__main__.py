@@ -16,6 +16,8 @@ from glob import iglob, glob
 import threading
 import time
 import subprocess
+import random as rd
+from math import sin, radians, floor
 
 import appdirs
 from PIL import Image
@@ -98,6 +100,8 @@ def parse_args():
                         default=appdirs.user_cache_dir(appname="himawaripy", appauthor=False))
     parser.add_argument("--dont-change", action="store_true", dest="dont_change", default=False,
                         help="don't change the wallpaper (just download it)")
+    parser.add_argument("--zoom", action="store_true", dest="zoom", default=False,
+                        help="use a random zoomed-in part of the picture")
 
     args = parser.parse_args()
 
@@ -160,15 +164,36 @@ def thread_main(args):
     if args.auto_offset or args.offset != 10:
         print("Offset version: {} GMT.".format(strftime("%Y/%m/%d %H:%M:%S", requested_time)))
 
-    png = Image.new("RGB", (WIDTH * level, HEIGHT * level))
-
-    p = mp_dummy.Pool(level * level)
+    if args.zoom == False:
+        tilenum = level
+        offset_x = 0
+        offset_y = 0
+        copyrange_x = range(tilenum)
+        copyrange_y = range(tilenum)
+    else:
+        tilenum = 3 #crop a 3*3 out of the level*level image 
+        #set boundry such that we don't look at complete darkness
+        h = requested_time.tm_hour
+        lower = floor(level/2+level/2*sin(radians(min(h/24*360+90,270))))
+        upper = floor(level/2+level/2*sin(radians(max(h/24*360-90,90))))
+        if lower == upper:
+            if h > 21:
+                offset_x = 0 #look at sunset(leftmost of image)
+            else:
+                offset_x = level-3 #look at sunrise(rightmost)
+        else:
+            offset_x = min(level-3, rd.randrange(lower,upper,1))
+        offset_y = rd.randrange(0,level-2,1)
+        copyrange_x = range(offset_x,offset_x+3)
+        copyrange_y = range(offset_y,offset_y+3)
+ 
+    png = Image.new("RGB", (WIDTH * tilenum, HEIGHT * tilenum))
+    p = mp_dummy.Pool(tilenum * tilenum)
     print("Downloading tiles...")
-    res = p.map(download_chunk, it.product(range(level), range(level), (requested_time,), (args.level,)))
-
+    res = p.map(download_chunk, it.product(copyrange_x, copyrange_y, (requested_time,), (args.level,)))
     for (x, y, tiledata) in res:
         tile = Image.open(io.BytesIO(tiledata))
-        png.paste(tile, (WIDTH * x, HEIGHT * y, WIDTH * (x + 1), HEIGHT * (y + 1)))
+        png.paste(tile, (WIDTH * (x-offset_x), HEIGHT * (y-offset_y), WIDTH * ((x-offset_x) + 1), HEIGHT * ((y-offset_y) + 1)))
 
     for file in iglob(path.join(args.output_dir, "himawari-*.png")):
         os.remove(file)
@@ -179,7 +204,7 @@ def thread_main(args):
     png.save(output_file, "PNG")
 
     if not args.dont_change:
-        r = set_background(output_file)
+        r = set_background(output_file,args.zoom)
         if not r:
             sys.exit("Your desktop environment '{}' is not supported!\n".format(get_desktop_environment()))
     else:
