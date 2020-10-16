@@ -56,7 +56,7 @@ def download_chunk(args):
     global counter
 
     x, y, latest, level = args
-    url_format = "https://himawari8.nict.go.jp/img/D531106/{}d/{}/{}_{}_{}.png"
+    url_format = "https://himawari8-dl.nict.go.jp/himawari8/img/D531106/{}d/{}/{}_{}_{}.png"
     url = url_format.format(level, WIDTH, strftime("%Y/%m/%d/%H%M%S", latest), x, y)
 
     tiledata = download(url)
