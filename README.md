@@ -41,6 +41,8 @@ optional arguments:
   -o OFFSET, --offset OFFSET
                         UTC time offset in hours, must be less than or equal
                         to +10
+  --auto-aspect-ratio   better for 16:10 aspect ratio desktop. works only on
+                        default level!
   -l {4,8,16,20}, --level {4,8,16,20}
                         increases the quality (and the size) of each tile.
                         possible values are 4, 8, 16, 20

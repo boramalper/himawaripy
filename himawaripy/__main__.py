@@ -87,6 +87,8 @@ def parse_args():
     group.add_argument("-o", "--offset", type=int, dest="offset", default=10,
                        help="UTC time offset in hours, must be less than or equal to +10")
 
+    parser.add_argument("--auto-aspect-ratio", action="store_true", dest="auto_aspect_ratio", default=False,
+                        help="better for 16:10 aspect ratio desktop. works only on default level!")
     parser.add_argument("-l", "--level", type=int, choices=[4, 8, 16, 20], dest="level", default=4,
                         help="increases the quality (and the size) of each tile. possible values are 4, 8, 16, 20")
     parser.add_argument("-d", "--deadline", type=int, dest="deadline", default=6,
@@ -169,6 +171,20 @@ def thread_main(args):
     for (x, y, tiledata) in res:
         tile = Image.open(io.BytesIO(tiledata))
         png.paste(tile, (WIDTH * x, HEIGHT * y, WIDTH * (x + 1), HEIGHT * (y + 1)))
+
+    if args.auto_aspect_ratio and args.level == 4:
+        MARGIN = 166
+
+        height = int(png.height + MARGIN * 2)
+        width = int(height * 1.6)
+
+        png_new = Image \
+            .new('RGB', (width, height), 0)
+
+        png_new.paste(png, (int(width / 2 - png.width / 2), MARGIN))
+
+        del png
+        png = png_new
 
     for file in iglob(path.join(args.output_dir, "himawari-*.png")):
         os.remove(file)
