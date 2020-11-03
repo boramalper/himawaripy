@@ -21,8 +21,10 @@ near-realtime picture of Earth.
 * GNOME 3
 * Cinnamon 2.8.8
 * KDE
+* Win10 1909 with python3.7
 
 ### Not Supported
+
 * any other desktop environments that are not mentioned above.
 
 ## Configuration
@@ -159,6 +161,41 @@ Finally, to launch it, enter this into the console:
 
     launchctl load ~/Library/LaunchAgents/org.boramalper.himawaripy.plist
 
+### For Win10 Users
+
+- change background color
+
+  ![](./win/figures/bg.png)
+
+- install from source
+
+  `python3 setup.py install`
+
+  after the installation，you can use `hiwamaripy` to fetch photos.
+
+  ![](./win/figures/tutorial-win-cmd.gif)
+
+   
+
+- modify `./win/auto.bat`
+
+  add your own parameters
+
+  ![](./win/figures/pic2.png)
+
+  
+
+- modify `./win/task.xml` 
+
+  replace the content of `<Command>` with your `run_silently.vbs` abs path,
+
+  so as the content of `<WorkingDirectory>`
+
+  ![](./win/figures/pic1.png)
+
+- gif tutorial
+
+  ![](./win/figures/tutorial-win.gif)
 
 ## Uninstallation
 

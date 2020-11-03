@@ -4,11 +4,21 @@ import sys
 import subprocess
 from distutils.version import LooseVersion
 
+import win32api
+import win32gui
+from win32.lib import win32con
+
 
 def set_background(file_path):
     de = get_desktop_environment()
-
-    if de == "mac":
+    if de == "windows":
+        key = win32api.RegOpenKeyEx(win32con.HKEY_CURRENT_USER,
+                                    "Control Panel\\Desktop", 0, win32con.KEY_SET_VALUE)
+        win32api.RegSetValueEx(key, "WallpaperStyle", 0, win32con.REG_SZ, "6")
+        # 2 for stretching, 0 for centering, 6 for fitting
+        win32api.RegSetValueEx(key, "TileWallpaper", 0, win32con.REG_SZ, "0")
+        win32gui.SystemParametersInfo(win32con.SPI_SETDESKWALLPAPER, file_path, 1 + 2)
+    elif de == "mac":
         subprocess.call(["osascript", "-e",
                          'tell application "System Events"\n'
                          'set theDesktops to a reference to every desktop\n'
