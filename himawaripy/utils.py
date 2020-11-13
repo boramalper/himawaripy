@@ -9,11 +9,16 @@ def set_background(file_path):
     de = get_desktop_environment()
 
     if de == "mac":
-        subprocess.call(["osascript", "-e",
-                         'tell application "System Events"\n'
-                         'set theDesktops to a reference to every desktop\n'
-                         'repeat with aDesktop in theDesktops\n'
-                         'set the picture of aDesktop to \"' + file_path + '"\nend repeat\nend tell'])
+        subprocess.call(
+            [
+                "osascript",
+                "-e",
+                'tell application "System Events"\n'
+                "set theDesktops to a reference to every desktop\n"
+                "repeat with aDesktop in theDesktops\n"
+                'set the picture of aDesktop to "' + file_path + '"\nend repeat\nend tell',
+            ]
+        )
     else:  # Linux
         # gsettings requires it.
         fetch_envvar("DBUS_SESSION_BUS_ADDRESS")
@@ -31,34 +36,52 @@ def set_background(file_path):
                 assert os.system('bash -c "gsettings set org.gnome.desktop.background draw-background true"') == 0
         elif de == "mate":
             subprocess.call(["gsettings", "set", "org.mate.background", "picture-filename", file_path])
-        elif de == 'i3':
-            subprocess.call(['feh', '--bg-max', file_path])
+        elif de == "i3":
+            subprocess.call(["feh", "--bg-max", file_path])
         elif de == "xfce4":
             # Xfce4 displays to change the background of
-            displays = subprocess.getoutput('xfconf-query --channel xfce4-desktop --list | grep last-image').split()
+            displays = subprocess.getoutput("xfconf-query --channel xfce4-desktop --list | grep last-image").split()
 
             for display in displays:
-                subprocess.call(["xfconf-query", "--channel", "xfce4-desktop", "--property", display, "--set", file_path])
+                subprocess.call(
+                    ["xfconf-query", "--channel", "xfce4-desktop", "--property", display, "--set", file_path]
+                )
         elif de == "lxde":
-            subprocess.call(["pcmanfm", "--set-wallpaper", file_path, "--wallpaper-mode=fit", ])
+            subprocess.call(
+                [
+                    "pcmanfm",
+                    "--set-wallpaper",
+                    file_path,
+                    "--wallpaper-mode=fit",
+                ]
+            )
         elif de == "kde":
             if plasma_version() > LooseVersion("5.7"):
-                ''' Command per https://github.com/boramalper/himawaripy/issues/57
+                """Command per https://github.com/boramalper/himawaripy/issues/57
 
-                    Sets 'FillMode' to 1, which is "Scaled, Keep Proportions"
-                    Forces 'Color' to black, which sets the background colour.
-                '''
-                script = 'var a = desktops();' \
-                         'for (i = 0; i < a.length; i++) {{' \
-                         'd = a[i];d.wallpaperPlugin = "org.kde.image";' \
-                         'd.currentConfigGroup = Array("Wallpaper", "org.kde.image", "General");' \
-                         'd.writeConfig("Image", "file://{}");' \
-                         'd.writeConfig("FillMode", 1);' \
-                         'd.writeConfig("Color", "#000");' \
-                         '}}'
+                Sets 'FillMode' to 1, which is "Scaled, Keep Proportions"
+                Forces 'Color' to black, which sets the background colour.
+                """
+                script = (
+                    "var a = desktops();"
+                    "for (i = 0; i < a.length; i++) {{"
+                    'd = a[i];d.wallpaperPlugin = "org.kde.image";'
+                    'd.currentConfigGroup = Array("Wallpaper", "org.kde.image", "General");'
+                    'd.writeConfig("Image", "file://{}");'
+                    'd.writeConfig("FillMode", 1);'
+                    'd.writeConfig("Color", "#000");'
+                    "}}"
+                )
                 try:
-                    subprocess.check_output(["qdbus", "org.kde.plasmashell", "/PlasmaShell",
-                                             "org.kde.PlasmaShell.evaluateScript", script.format(file_path)])
+                    subprocess.check_output(
+                        [
+                            "qdbus",
+                            "org.kde.plasmashell",
+                            "/PlasmaShell",
+                            "org.kde.PlasmaShell.evaluateScript",
+                            script.format(file_path),
+                        ]
+                    )
                 except subprocess.CalledProcessError as e:
                     if "Widgets are locked" in e.output.decode("utf-8"):
                         print("Cannot change the wallpaper while widgets are locked! (unlock the widgets)")
@@ -67,12 +90,16 @@ def set_background(file_path):
             else:
                 print("Couldn't detect plasmashell 5.7 or higher.")
         elif has_program("feh"):
-            print("Couldn't detect your desktop environment ('{}'), but you have "
-                  "'feh' installed so we will use it...".format(de))
+            print(
+                "Couldn't detect your desktop environment ('{}'), but you have "
+                "'feh' installed so we will use it...".format(de)
+            )
             subprocess.call(["feh", "--bg-max", file_path])
         elif has_program("nitrogen"):
-            print("Couldn't detect your desktop environment ('{}'), but you have "
-                  "'nitrogen' installed so we will use it...".format(de))
+            print(
+                "Couldn't detect your desktop environment ('{}'), but you have "
+                "'nitrogen' installed so we will use it...".format(de)
+            )
             subprocess.call(["nitrogen", "--restore"])
         else:
             return False
@@ -97,9 +124,26 @@ def get_desktop_environment():
         if desktop_session is not None:
             # Easier to match if we don't have to deal with character cases
             desktop_session = desktop_session.lower()
-            if desktop_session in ["gnome", "unity", "cinnamon", "mate", "xfce4", "lxde", "fluxbox",
-                                   "blackbox", "openbox", "icewm", "jwm", "afterstep", "trinity", "kde", "pantheon",
-                                   "gnome-classic", "i3", "budgie-desktop"]:
+            if desktop_session in [
+                "gnome",
+                "unity",
+                "cinnamon",
+                "mate",
+                "xfce4",
+                "lxde",
+                "fluxbox",
+                "blackbox",
+                "openbox",
+                "icewm",
+                "jwm",
+                "afterstep",
+                "trinity",
+                "kde",
+                "pantheon",
+                "gnome-classic",
+                "i3",
+                "budgie-desktop",
+            ]:
                 return desktop_session
             ## Special cases ##
             # Canonical sets $DESKTOP_SESSION to Lubuntu rather than LXDE if using LXDE.
@@ -122,10 +166,10 @@ def get_desktop_environment():
         fetch_envvar("KDE_FULL_SESSION")
         fetch_envvar("GNOME_DESKTOP_SESSION_ID")
 
-        if os.environ.get('KDE_FULL_SESSION') == 'true':
+        if os.environ.get("KDE_FULL_SESSION") == "true":
             return "kde"
-        elif os.environ.get('GNOME_DESKTOP_SESSION_ID'):
-            if "deprecated" not in os.environ.get('GNOME_DESKTOP_SESSION_ID'):
+        elif os.environ.get("GNOME_DESKTOP_SESSION_ID"):
+            if "deprecated" not in os.environ.get("GNOME_DESKTOP_SESSION_ID"):
                 return "gnome2"
         # From http://ubuntuforums.org/showthread.php?t=652320
         elif is_running("xfce-mcs-manage"):
@@ -195,7 +239,11 @@ def fetch_envvar(varname):
     if varname in os.environ:
         return
 
-    val = os.popen('bash -c "grep -z ^{}= /proc/$(pgrep -n pulseaudio)/environ | cut -d= -f2-"'.format(varname)).read().strip("\0\n")
+    val = (
+        os.popen('bash -c "grep -z ^{}= /proc/$(pgrep -n pulseaudio)/environ | cut -d= -f2-"'.format(varname))
+        .read()
+        .strip("\0\n")
+    )
     if val:
         print("Fetched env. var. {} as `{}`".format(varname, val))
         os.environ[varname] = val
