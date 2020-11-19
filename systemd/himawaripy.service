@@ -5,5 +5,4 @@ Description=Update desktop background with satellite imagery
 
 [Service]
 Type=oneshot
-# Place command line arguments into ExecStart
-ExecStart=<INSTALLATION_PATH>
+ExecStart=bash -c "himawaripy --auto-offset --save-battery"
