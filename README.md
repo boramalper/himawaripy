@@ -146,8 +146,7 @@ Finally, to launch it, enter this into the console:
 ### For Win10 Users
 
 1. Edit `win\auto.bat` if you like.
-2. `win\install.bat` to install a schedule.
-3. `win\uninstall.bat` to uninstall the schedule.
+2. add `win\run_silently.vbs` to schedule, and config it to once an hour.
 
 ## Uninstallation
 
