@@ -143,6 +143,11 @@ Finally, to launch it, enter this into the console:
 
     launchctl load ~/Library/LaunchAgents/org.boramalper.himawaripy.plist
 
+### For Win10 Users
+
+1. Edit `win\auto.bat` if you like.
+2. `win\install.bat` to install a schedule.
+3. `win\uninstall.bat` to uninstall the schedule.
 
 ## Uninstallation
 
