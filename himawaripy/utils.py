@@ -5,10 +5,33 @@ import subprocess
 from distutils.version import LooseVersion
 
 
+def set_wallpaper_from_bmp(bmp_path):
+    import win32api
+    import win32gui
+    from win32.lib import win32con
+    #打开指定注册表路径
+    reg_key = win32api.RegOpenKeyEx(
+        win32con.HKEY_CURRENT_USER, "Control Panel\\Desktop", 0, win32con.KEY_SET_VALUE)
+    #最后的参数:2拉伸,0居中,6适应,10填充,0平铺
+    win32api.RegSetValueEx(reg_key, "WallpaperStyle", 0, win32con.REG_SZ, "0")
+    #最后的参数:1表示平铺,拉伸居中等都是0
+    win32api.RegSetValueEx(reg_key, "TileWallpaper", 0, win32con.REG_SZ, "0")
+    #刷新桌面
+    win32gui.SystemParametersInfo(
+        win32con.SPI_SETDESKWALLPAPER, bmp_path, win32con.SPIF_SENDWININICHANGE)
+
+
 def set_background(file_path):
     de = get_desktop_environment()
-
-    if de == "mac":
+    if de == "windows":
+        import PIL.Image
+        img_path = file_path
+        img_dir = os.path.dirname(img_path)
+        bmpImage = PIL.Image.open(img_path)
+        new_bmp_path = os.path.join(img_dir, 'wallpaper.bmp')
+        bmpImage.save(new_bmp_path, "BMP")
+        set_wallpaper_from_bmp(new_bmp_path)
+    elif de == "mac":
         subprocess.call(
             [
                 "osascript",
@@ -249,3 +272,6 @@ def fetch_envvar(varname):
         os.environ[varname] = val
     else:
         print("Could NOT retrieve env. var. {}".format(varname))
+
+if __name__ == "__main__":
+    set_background("e:\data\hima\himawari-20210211T021000.png")

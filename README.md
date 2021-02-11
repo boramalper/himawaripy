@@ -143,6 +143,10 @@ Finally, to launch it, enter this into the console:
 
     launchctl load ~/Library/LaunchAgents/org.boramalper.himawaripy.plist
 
+### For Win10 Users
+
+1. Edit `win\auto.bat` if you like.
+2. add `win\run_silently.vbs` to schedule, and config it to once per 10 minutes.
 
 ## Uninstallation
 
