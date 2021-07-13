@@ -29,8 +29,10 @@ near-realtime picture of Earth.
 
 ```
 usage: himawaripy [-h] [--version] [--auto-offset | -o OFFSET]
-                  [-l {4,8,16,20}] [-d DEADLINE] [--save-battery]
-                  [--output-dir OUTPUT_DIR] [--dont-change]
+                  [-l {4,8,16,20}]
+                  [--band {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}]
+                  [-d DEADLINE] [--save-battery] [--output-dir OUTPUT_DIR]
+                  [--dont-change]
 
 set (near-realtime) picture of Earth as your desktop background
 
@@ -44,6 +46,10 @@ optional arguments:
   -l {4,8,16,20}, --level {4,8,16,20}
                         increases the quality (and the size) of each tile.
                         possible values are 4, 8, 16, 20
+  --band {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}
+                        If 0, get RGB visible light picture; if 1 to 16, get
+                        just that band as greyscale image. See
+                        https://en.wikipedia.org/wiki/Himawari_8#Instruments.
   -d DEADLINE, --deadline DEADLINE
                         deadline in minutes to download all the tiles, set 0
                         to cancel
@@ -51,7 +57,6 @@ optional arguments:
   --output-dir OUTPUT_DIR
                         directory to save the temporary background image
   --dont-change         don't change the wallpaper (just download it)
-
 ```
 
 Most of the time himawaripy can accurately detect your timezone if you pass the flag `--auto-offset`, although you may
