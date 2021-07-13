@@ -55,9 +55,9 @@ def calculate_time_offset(latest_date, auto, preferred_offset):
 def download_chunk(args):
     global counter
 
-    x, y, latest, level = args
-    url_format = "https://himawari8-dl.nict.go.jp/himawari8/img/D531106/{}d/{}/{}_{}_{}.png"
-    url = url_format.format(level, WIDTH, strftime("%Y/%m/%d/%H%M%S", latest), x, y)
+    x, y, band, latest, level = args
+    url_format = "https://himawari8-dl.nict.go.jp/himawari8/img/{}/{}d/{}/{}_{}_{}.png"
+    url = url_format.format(band, level, WIDTH, strftime("%Y/%m/%d/%H%M%S", latest), x, y)
 
     tiledata = download(url)
 
@@ -71,7 +71,7 @@ def download_chunk(args):
             print("Downloading tiles: completed.")
         else:
             print("Downloading tiles: {}/{} completed...".format(counter.value, level * level))
-    return x, y, tiledata
+    return x, y, band, tiledata
 
 
 def parse_args():
@@ -104,6 +104,13 @@ def parse_args():
         dest="level",
         default=4,
         help="increases the quality (and the size) of each tile. possible values are 4, 8, 16, 20",
+    )
+    parser.add_argument(
+        "--band",
+        type=int,
+        choices=range(0, 17),
+        default=0,
+        help="If 0, get RGB visible light picture; if 1 to 16, get just that band as greyscale image. See https://en.wikipedia.org/wiki/Himawari_8#Instruments."
     )
     parser.add_argument(
         "-d",
@@ -192,13 +199,20 @@ def thread_main(args):
     if args.auto_offset or args.offset != 10:
         print("Offset version: {} GMT.".format(strftime("%Y/%m/%d %H:%M:%S", requested_time)))
 
-    png = Image.new("RGB", (WIDTH * level, HEIGHT * level))
+    if args.band > 0:
+        band = "FULL_24h/B{:02d}".format(args.band)
+        image_mode = "LA"
+    else:
+        band = "D531106"
+        image_mode = "RGB"
+
+    png = Image.new(image_mode, (WIDTH * level, HEIGHT * level))
 
     p = mp_dummy.Pool(level * level)
     print("Downloading tiles...")
-    res = p.map(download_chunk, it.product(range(level), range(level), (requested_time,), (args.level,)))
+    res = p.map(download_chunk, it.product(range(level), range(level), (band,), (requested_time,), (args.level,)))
 
-    for (x, y, tiledata) in res:
+    for (x, y, band, tiledata) in res:
         tile = Image.open(io.BytesIO(tiledata))
         png.paste(tile, (WIDTH * x, HEIGHT * y, WIDTH * (x + 1), HEIGHT * (y + 1)))
 
