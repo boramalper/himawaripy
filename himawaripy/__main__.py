@@ -144,7 +144,11 @@ def parse_args():
 
 def is_discharging():
     if sys.platform.startswith("linux"):
-        if len(glob("/sys/class/power_supply/BAT*")) > 1:
+        battery_count = len(glob("/sys/class/power_supply/BAT*"))
+        if battery_count == 0:
+            print("No batteries detected, skipping discharching check.")
+            return False
+        elif battery_count > 1:
             print("Multiple batteries detected, using BAT0.")
 
         with open("/sys/class/power_supply/BAT0/status") as f:
