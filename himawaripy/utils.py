@@ -30,6 +30,7 @@ def set_background(file_path):
             if de == "unity":
                 subprocess.call(["gsettings", "set", "org.gnome.desktop.background", "draw-background", "false"])
             subprocess.call(["gsettings", "set", "org.gnome.desktop.background", "picture-uri", "file://" + file_path])
+            subprocess.call(["gsettings", "set", "org.gnome.desktop.background", "picture-uri-dark", "file://" + file_path])
             subprocess.call(["gsettings", "set", "org.gnome.desktop.background", "picture-options", "scaled"])
             subprocess.call(["gsettings", "set", "org.gnome.desktop.background", "primary-color", "#000000"])
             if de == "unity":
